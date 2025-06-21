@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Plan Submission</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .section { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .point-group { border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>Daily Transport Plan Submission</h1>
+    
+    <form id="transportForm">
+        <div class="section">
+            <h3>Vehicle Information</h3>
+            <div class="form-group">
+                <label for="truckNumber">Truck Number:</label>
+                <input type="text" id="truckNumber" name="truckNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="trailerNumber">Trailer Number:</label>
+                <input type="text" id="trailerNumber" name="trailerNumber" required>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Driver Information</h3>
+            <div class="form-group">
+                <label for="driverName">Driver Name:</label>
+                <select id="driverName" name="driverName" required>
+                    <option value="">Loading drivers...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="driverPhone">Driver Phone:</label>
+                <input type="tel" id="driverPhone" name="driverPhone" required readonly>
+            </div>
+            <div class="form-group">
+                <label for="telegramUsername">Telegram Username:</label>
+                <input type="text" id="telegramUsername" name="telegramUsername" placeholder="@username">
+            </div>
+            <div class="form-group">
+                <label for="driverEmail">Driver Email (for backup):</label>
+                <input type="email" id="driverEmail" name="driverEmail" readonly>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Collection Points</h3>
+            <div id="collectionPoints">
+                <div class="point-group">
+                    <label>Collection Point 1:</label>
+                    <input type="text" name="collectionAddress[]" placeholder="Full address" required>
+                    <input type="time" name="collectionTime[]" step="60" required>
+                    <textarea name="collectionNotes[]" rows="2" placeholder="Special instructions, contact info, etc."></textarea>
+                </div>
+            </div>
+            <button type="button" onclick="addCollectionPoint()">+ Add Collection Point</button>
+        </div>
+
+        <div class="section">
+            <h3>Delivery Points</h3>
+            <div id="deliveryPoints">
+                <div class="point-group">
+                    <label>Delivery Point 1:</label>
+                    <input type="text" name="deliveryAddress[]" placeholder="Full address" required>
+                    <input type="time" name="deliveryTime[]" step="60" required>
+                    <textarea name="deliveryNotes[]" rows="2" placeholder="Special instructions, contact info, etc."></textarea>
+                </div>
+            </div>
+            <button type="button" onclick="addDeliveryPoint()">+ Add Delivery Point</button>
+        </div>
+
+        <div class="section">
+            <h3>Additional Information</h3>
+            <div class="form-group">
+                <label for="planDate">Plan Date:</label>
+                <input type="date" id="planDate" name="planDate" required>
+            </div>
+            <div class="form-group">
+                <label for="specialInstructions">Special Instructions:</label>
+                <textarea id="specialInstructions" name="specialInstructions" rows="3" placeholder="Any special instructions for the day"></textarea>
+            </div>
+        </div>
+
+        <button type="submit">Submit Transport Plan</button>
+    </form>
+
+    <script>
+        let collectionCount = 1;
+        let deliveryCount = 1;
+        let driversData = [];
+
+        // Load drivers from Supabase
+        async function loadDrivers() {
+            try {
+                const response = await fetch('https://ultxmlfybjoqdhmsqwek.supabase.co/rest/v1/drivers?select=*', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw'
+                    }
+                });
+                
+                const drivers = await response.json();
+                driversData = drivers.filter(driver => driver.name && driver.name.trim() !== '');
+                
+                const driverSelect = document.getElementById('driverName');
+                driverSelect.innerHTML = '<option value="">Select Driver</option>';
+                
+                driversData.forEach(driver => {
+                    const option = document.createElement('option');
+                    option.value = driver.id;
+                    option.textContent = driver.name;
+                    option.dataset.phone = driver.phone;
+                    option.dataset.email = driver.email;
+                    driverSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading drivers:', error);
+                const driverSelect = document.getElementById('driverName');
+                driverSelect.innerHTML = '<option value="">Error loading drivers</option>';
+            }
+        }
+
+        // Auto-fill driver details when driver is selected
+        document.getElementById('driverName').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('driverPhone').value = selectedOption.dataset.phone || '';
+                document.getElementById('driverEmail').value = selectedOption.dataset.email || '';
+            } else {
+                document.getElementById('driverPhone').value = '';
+                document.getElementById('driverEmail').value = '';
+            }
+        });
+
+        function addCollectionPoint() {
+            collectionCount++;
+            const container = document.getElementById('collectionPoints');
+            const pointDiv = document.createElement('div');
+            pointDiv.className = 'point-group';
+            pointDiv.innerHTML = `
+                <label>Collection Point ${collectionCount}:</label>
+                <input type="text" name="collectionAddress[]" placeholder="Full address" required>
+                <input type="time" name="collectionTime[]" step="60" required>
+                <textarea name="collectionNotes[]" rows="2" placeholder="Special instructions, contact info, etc."></textarea>
+                <button type="button" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            container.appendChild(pointDiv);
+        }
+
+        function addDeliveryPoint() {
+            deliveryCount++;
+            const container = document.getElementById('deliveryPoints');
+            const pointDiv = document.createElement('div');
+            pointDiv.className = 'point-group';
+            pointDiv.innerHTML = `
+                <label>Delivery Point ${deliveryCount}:</label>
+                <input type="text" name="deliveryAddress[]" placeholder="Full address" required>
+                <input type="time" name="deliveryTime[]" step="60" required>
+                <textarea name="deliveryNotes[]" rows="2" placeholder="Special instructions, contact info, etc."></textarea>
+                <button type="button" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            container.appendChild(pointDiv);
+        }
+
+        // Set today's date as default
+        document.getElementById('planDate').valueAsDate = new Date();
+
+        // Form submission
+        document.getElementById('transportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (key.includes('[]')) {
+                    const cleanKey = key.replace('[]', '');
+                    if (!data[cleanKey]) data[cleanKey] = [];
+                    data[cleanKey].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            try {
+                // Use n8n Cloud production webhook URL
+                const response = await fetch('https://hakro.app.n8n.cloud/webhook/transport-plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Transport plan submitted successfully! The driver will receive their schedule via Telegram.');
+                    this.reset();
+                    document.getElementById('planDate').valueAsDate = new Date();
+                } else {
+                    alert('Error submitting plan. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error submitting plan. Please check your connection.');
+            }
+        });
+
+        // Load drivers when page loads
+        document.addEventListener('DOMContentLoaded', loadDrivers);
+    </script>
+</body>
+</html> 
