@@ -23,12 +23,24 @@
         <div class="section">
             <h3>Vehicle Information</h3>
             <div class="form-group">
-                <label for="truckNumber">Truck Number:</label>
-                <input type="text" id="truckNumber" name="truckNumber" required>
+                <label for="truckSelect">Select Truck:</label>
+                <select id="truckSelect" name="truckSelect" required>
+                    <option value="">Loading trucks...</option>
+                </select>
             </div>
             <div class="form-group">
-                <label for="trailerNumber">Trailer Number:</label>
-                <input type="text" id="trailerNumber" name="trailerNumber" required>
+                <label for="truckDetails">Truck Details:</label>
+                <input type="text" id="truckDetails" name="truckDetails" readonly placeholder="Truck details will appear here">
+            </div>
+            <div class="form-group">
+                <label for="trailerSelect">Select Trailer:</label>
+                <select id="trailerSelect" name="trailerSelect" required>
+                    <option value="">Loading trailers...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="trailerDetails">Trailer Details:</label>
+                <input type="text" id="trailerDetails" name="trailerDetails" readonly placeholder="Trailer details will appear here">
             </div>
         </div>
 
@@ -99,6 +111,70 @@
         let collectionCount = 1;
         let deliveryCount = 1;
         let driversData = [];
+        let trucksData = [];
+        let trailersData = [];
+
+        // Load trucks from Supabase
+        async function loadTrucks() {
+            try {
+                const response = await fetch('https://ultxmlfybjoqdhmsqwek.supabase.co/rest/v1/trucks?select=*&is_active=eq.true', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw'
+                    }
+                });
+                
+                const trucks = await response.json();
+                trucksData = trucks;
+                
+                const truckSelect = document.getElementById('truckSelect');
+                truckSelect.innerHTML = '<option value="">Select Truck</option>';
+                
+                trucks.forEach(truck => {
+                    const option = document.createElement('option');
+                    option.value = truck.id;
+                    option.textContent = `${truck.truck_number} - ${truck.make} ${truck.model}`;
+                    option.dataset.details = `${truck.make} ${truck.model} (${truck.year}) - ${truck.capacity_kg}kg - ${truck.license_plate}`;
+                    truckSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading trucks:', error);
+                const truckSelect = document.getElementById('truckSelect');
+                truckSelect.innerHTML = '<option value="">Error loading trucks</option>';
+            }
+        }
+
+        // Load trailers from Supabase
+        async function loadTrailers() {
+            try {
+                const response = await fetch('https://ultxmlfybjoqdhmsqwek.supabase.co/rest/v1/trailers?select=*&is_active=eq.true', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw'
+                    }
+                });
+                
+                const trailers = await response.json();
+                trailersData = trailers;
+                
+                const trailerSelect = document.getElementById('trailerSelect');
+                trailerSelect.innerHTML = '<option value="">Select Trailer</option>';
+                
+                trailers.forEach(trailer => {
+                    const option = document.createElement('option');
+                    option.value = trailer.id;
+                    option.textContent = `${trailer.trailer_number} - ${trailer.type} ${trailer.make || ''}`;
+                    option.dataset.details = `${trailer.type} ${trailer.make || ''} ${trailer.model || ''} - ${trailer.capacity_kg}kg - ${trailer.license_plate}`;
+                    trailerSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading trailers:', error);
+                const trailerSelect = document.getElementById('trailerSelect');
+                trailerSelect.innerHTML = '<option value="">Error loading trailers</option>';
+            }
+        }
 
         // Load drivers from Supabase
         async function loadDrivers() {
@@ -141,6 +217,26 @@
             } else {
                 document.getElementById('driverPhone').value = '';
                 document.getElementById('driverEmail').value = '';
+            }
+        });
+
+        // Auto-fill truck details when truck is selected
+        document.getElementById('truckSelect').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('truckDetails').value = selectedOption.dataset.details || '';
+            } else {
+                document.getElementById('truckDetails').value = '';
+            }
+        });
+
+        // Auto-fill trailer details when trailer is selected
+        document.getElementById('trailerSelect').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('trailerDetails').value = selectedOption.dataset.details || '';
+            } else {
+                document.getElementById('trailerDetails').value = '';
             }
         });
 
@@ -218,8 +314,12 @@
             }
         });
 
-        // Load drivers when page loads
-        document.addEventListener('DOMContentLoaded', loadDrivers);
+        // Load all data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDrivers();
+            loadTrucks();
+            loadTrailers();
+        });
     </script>
 </body>
 </html> 
