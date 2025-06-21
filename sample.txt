@@ -1,0 +1,12 @@
+this is a folder for drivers collection and deliveries plannig project.
+there should be plan for a day for a driver and should be sent to telegeram app and email (testing purposes).
+
+what should be included:
+    driver id or name
+    assigned truck and trailer for the job.
+    collection and delivery points.
+    collection and deliveries timing.
+    everything shoud be in a correct sequence.
+    message should layed out nicely.
+    plan should be easy to understand for everyone.
+    probably each task should be numbered.

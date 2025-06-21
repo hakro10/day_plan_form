@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POD Upload - Proof of Delivery</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .form-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        button { background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        button:hover { background: #218838; }
+        .header { text-align: center; color: #333; margin-bottom: 30px; }
+        .photo-upload { border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 6px; }
+        .photo-preview { max-width: 200px; margin: 10px auto; display: block; border-radius: 6px; }
+        .status { padding: 10px; border-radius: 6px; margin: 10px 0; text-align: center; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="header">
+            <h1>📋 POD Upload</h1>
+            <p>Proof of Delivery Submission</p>
+        </div>
+        
+        <form id="podForm">
+            <div class="form-group">
+                <label for="planId">Plan ID:</label>
+                <input type="text" id="planId" name="planId" placeholder="PLAN_1234567890" required>
+            </div>
+
+            <div class="form-group">
+                <label for="driverName">Driver Name:</label>
+                <input type="text" id="driverName" name="driverName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="deliveryType">Delivery Type:</label>
+                <select id="deliveryType" name="deliveryType" required>
+                    <option value="">Select type</option>
+                    <option value="collection">Collection</option>
+                    <option value="delivery">Delivery</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Location/Address:</label>
+                <input type="text" id="location" name="location" placeholder="Delivery/Collection address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contactPerson">Contact Person:</label>
+                <input type="text" id="contactPerson" name="contactPerson" placeholder="Person who signed/received">
+            </div>
+
+            <div class="form-group">
+                <label for="deliveryTime">Actual Time:</label>
+                <input type="datetime-local" id="deliveryTime" name="deliveryTime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="">Select status</option>
+                    <option value="completed">Completed Successfully</option>
+                    <option value="partial">Partial Delivery</option>
+                    <option value="failed">Failed/Refused</option>
+                    <option value="rescheduled">Rescheduled</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="podPhoto">POD Photo/Signature:</label>
+                <div class="photo-upload">
+                    <input type="file" id="podPhoto" name="podPhoto" accept="image/*" capture="environment" required>
+                    <p>📷 Take photo of signed delivery note or signature</p>
+                </div>
+                <img id="photoPreview" class="photo-preview" style="display:none;">
+            </div>
+
+            <div class="form-group">
+                <label for="additionalPhotos">Additional Photos (Optional):</label>
+                <input type="file" id="additionalPhotos" name="additionalPhotos" accept="image/*" multiple capture="environment">
+                <small>Damage, special conditions, etc.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes/Comments:</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Any issues, special instructions followed, damage notes, etc."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="odometerReading">Odometer Reading (Optional):</label>
+                <input type="number" id="odometerReading" name="odometerReading" placeholder="Current mileage">
+            </div>
+
+            <button type="submit">📤 Submit POD</button>
+        </form>
+
+        <div id="statusMessage" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Set current date/time as default
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('deliveryTime').value = now.toISOString().slice(0, 16);
+
+        // Photo preview
+        document.getElementById('podPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photoPreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form submission
+        document.getElementById('podForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const statusDiv = document.getElementById('statusMessage');
+            
+            // Convert files to base64 for JSON transmission
+            const podPhoto = document.getElementById('podPhoto').files[0];
+            const additionalPhotos = document.getElementById('additionalPhotos').files;
+            
+            const data = {
+                planId: formData.get('planId'),
+                driverName: formData.get('driverName'),
+                deliveryType: formData.get('deliveryType'),
+                location: formData.get('location'),
+                contactPerson: formData.get('contactPerson'),
+                deliveryTime: formData.get('deliveryTime'),
+                status: formData.get('status'),
+                notes: formData.get('notes'),
+                odometerReading: formData.get('odometerReading'),
+                submittedAt: new Date().toISOString()
+            };
+
+            // Convert main photo to base64
+            if (podPhoto) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    data.podPhoto = e.target.result;
+                    
+                    // Handle additional photos
+                    const additionalPhotosArray = [];
+                    if (additionalPhotos.length > 0) {
+                        for (let i = 0; i < additionalPhotos.length; i++) {
+                            const additionalReader = new FileReader();
+                            additionalReader.onload = function(e) {
+                                additionalPhotosArray.push(e.target.result);
+                                if (additionalPhotosArray.length === additionalPhotos.length) {
+                                    data.additionalPhotos = additionalPhotosArray;
+                                    submitPOD(data, statusDiv);
+                                }
+                            };
+                            additionalReader.readAsDataURL(additionalPhotos[i]);
+                        }
+                    } else {
+                        submitPOD(data, statusDiv);
+                    }
+                };
+                reader.readAsDataURL(podPhoto);
+            } else {
+                submitPOD(data, statusDiv);
+            }
+        });
+
+        async function submitPOD(data, statusDiv) {
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status';
+                statusDiv.innerHTML = '⏳ Submitting POD...';
+
+                const response = await fetch('http://localhost:5678/webhook/pod-upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ POD submitted successfully!';
+                    document.getElementById('podForm').reset();
+                    document.getElementById('photoPreview').style.display = 'none';
+                    
+                    // Reset datetime to current time
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    document.getElementById('deliveryTime').value = now.toISOString().slice(0, 16);
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Error submitting POD. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html> 
