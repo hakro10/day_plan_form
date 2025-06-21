@@ -29,8 +29,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="truckDetails">Truck Details:</label>
-                <input type="text" id="truckDetails" name="truckDetails" readonly placeholder="Truck details will appear here">
+                <label for="truckNumber">Truck Details:</label>
+                <input type="text" id="truckNumber" name="truckNumber" readonly placeholder="Truck details will appear here">
             </div>
             <div class="form-group">
                 <label for="trailerSelect">Select Trailer:</label>
@@ -39,8 +39,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="trailerDetails">Trailer Details:</label>
-                <input type="text" id="trailerDetails" name="trailerDetails" readonly placeholder="Trailer details will appear here">
+                <label for="trailerNumber">Trailer Details:</label>
+                <input type="text" id="trailerNumber" name="trailerNumber" readonly placeholder="Trailer details will appear here">
             </div>
         </div>
 
@@ -224,9 +224,9 @@
         document.getElementById('truckSelect').addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.value) {
-                document.getElementById('truckDetails').value = selectedOption.dataset.details || '';
+                document.getElementById('truckNumber').value = selectedOption.dataset.details || '';
             } else {
-                document.getElementById('truckDetails').value = '';
+                document.getElementById('truckNumber').value = '';
             }
         });
 
@@ -234,9 +234,9 @@
         document.getElementById('trailerSelect').addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.value) {
-                document.getElementById('trailerDetails').value = selectedOption.dataset.details || '';
+                document.getElementById('trailerNumber').value = selectedOption.dataset.details || '';
             } else {
-                document.getElementById('trailerDetails').value = '';
+                document.getElementById('trailerNumber').value = '';
             }
         });
 
@@ -290,6 +290,35 @@
                     data[key] = value;
                 }
             }
+
+            // Add actual truck and trailer details instead of just IDs
+            const selectedTruckId = data.truckSelect;
+            const selectedTrailerId = data.trailerSelect;
+            const selectedDriverId = data.driverName;
+
+            // Find selected truck details
+            const selectedTruck = trucksData.find(truck => truck.id == selectedTruckId);
+            if (selectedTruck) {
+                data.truckNumber = `${selectedTruck.truck_number} - ${selectedTruck.make} ${selectedTruck.model} (${selectedTruck.year || 'N/A'}) - ${selectedTruck.capacity_kg || 'N/A'}kg`;
+            }
+
+            // Find selected trailer details
+            const selectedTrailer = trailersData.find(trailer => trailer.id == selectedTrailerId);
+            if (selectedTrailer) {
+                data.trailerNumber = `${selectedTrailer.trailer_number} - ${selectedTrailer.type} ${selectedTrailer.make || ''} ${selectedTrailer.model || ''} - ${selectedTrailer.capacity_kg || 'N/A'}kg`;
+            }
+
+            // Find selected driver details (keep original driver name field)
+            const selectedDriver = driversData.find(driver => driver.id == selectedDriverId);
+            if (selectedDriver) {
+                data.driverName = selectedDriver.name;
+                data.driverPhone = selectedDriver.phone;
+                data.driverEmail = selectedDriver.email;
+            }
+
+            // Clean up the select field data (remove the ID fields)
+            delete data.truckSelect;
+            delete data.trailerSelect;
 
             try {
                 // Use n8n Cloud production webhook URL
