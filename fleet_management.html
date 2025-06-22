@@ -337,12 +337,34 @@
         <!-- Search Driver Tab -->
         <div id="searchTab" class="tab-content">
             <h3>Search & Edit Driver</h3>
-            <div class="form-group">
-                <label for="searchPhone">Search by Phone Number</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="tel" id="searchPhone" placeholder="Enter phone number..." style="flex: 1;">
-                    <button onclick="searchDriver()" style="width: auto;">🔍 Search</button>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="searchPhone">Search by Phone Number</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="tel" id="searchPhone" placeholder="Enter phone number..." style="flex: 1;">
+                        <button onclick="searchDriverByPhone()" style="width: auto;">🔍 Search</button>
+                    </div>
                 </div>
+                <div class="form-group">
+                    <label for="searchName">Search by Name</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="searchName" placeholder="Enter driver name..." style="flex: 1;">
+                        <button onclick="searchDriverByName()" style="width: auto;">🔍 Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="searchEmail">Search by Email</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="email" id="searchEmail" placeholder="Enter email address..." style="flex: 1;">
+                    <button onclick="searchDriverByEmail()" style="width: auto;">🔍 Search</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button onclick="clearSearchResults()" class="btn-warning">🗑️ Clear Results</button>
             </div>
 
             <div id="searchResults"></div>
@@ -514,19 +536,55 @@
             displayDrivers(filteredDrivers);
         }
 
-        // Search Driver
-        async function searchDriver() {
+        // Search Driver by Phone
+        async function searchDriverByPhone() {
             const phone = document.getElementById('searchPhone').value.trim();
             if (!phone) {
                 showMessage('❌ Please enter a phone number', 'error');
                 return;
             }
 
+            await performSearch('phone', phone, 'phone number');
+        }
+
+        // Search Driver by Name
+        async function searchDriverByName() {
+            const name = document.getElementById('searchName').value.trim();
+            if (!name) {
+                showMessage('❌ Please enter a driver name', 'error');
+                return;
+            }
+
+            await performSearch('name', name, 'name');
+        }
+
+        // Search Driver by Email
+        async function searchDriverByEmail() {
+            const email = document.getElementById('searchEmail').value.trim();
+            if (!email) {
+                showMessage('❌ Please enter an email address', 'error');
+                return;
+            }
+
+            await performSearch('email', email, 'email');
+        }
+
+        // Generic search function
+        async function performSearch(field, value, fieldName) {
             const searchResults = document.getElementById('searchResults');
             searchResults.innerHTML = '<div class="loading">Searching...</div>';
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/drivers?phone=eq.${encodeURIComponent(phone)}`, {
+                let url;
+                if (field === 'name') {
+                    // Use ilike for case-insensitive partial matching for names
+                    url = `${SUPABASE_URL}/rest/v1/drivers?name=ilike.*${encodeURIComponent(value)}*`;
+                } else {
+                    // Use exact match for phone and email
+                    url = `${SUPABASE_URL}/rest/v1/drivers?${field}=eq.${encodeURIComponent(value)}`;
+                }
+
+                const response = await fetch(url, {
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -536,9 +594,13 @@
                 if (response.ok) {
                     const drivers = await response.json();
                     if (drivers.length > 0) {
-                        displayEditForm(drivers[0]);
+                        if (drivers.length === 1) {
+                            displayEditForm(drivers[0]);
+                        } else {
+                            displayMultipleResults(drivers, fieldName, value);
+                        }
                     } else {
-                        searchResults.innerHTML = '<div class="error-message">📭 No driver found with this phone number</div>';
+                        searchResults.innerHTML = `<div class="error-message">📭 No driver found with this ${fieldName}</div>`;
                     }
                 } else {
                     searchResults.innerHTML = '<div class="error-message">❌ Error searching driver</div>';
@@ -546,6 +608,76 @@
             } catch (error) {
                 searchResults.innerHTML = '<div class="error-message">❌ Network error</div>';
             }
+        }
+
+        // Display multiple search results
+        function displayMultipleResults(drivers, fieldName, searchValue) {
+            const searchResults = document.getElementById('searchResults');
+            searchResults.innerHTML = `
+                <div class="success-message">
+                    ✅ Found ${drivers.length} drivers matching "${searchValue}"
+                </div>
+                <div class="driver-list">
+                    ${drivers.map(driver => `
+                        <div class="driver-card ${driver.is_active ? 'active' : 'inactive'}">
+                            <div class="driver-header">
+                                <div class="driver-name">${driver.name}</div>
+                                <div class="driver-status ${driver.is_active ? 'status-active' : 'status-inactive'}">
+                                    ${driver.is_active ? 'Active' : 'Inactive'}
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <div class="info-item">
+                                    <span class="info-label">📱 Phone:</span> ${driver.phone}
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">📧 Email:</span> ${driver.email}
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">💬 Telegram:</span> ${driver.telegram_username || 'Not set'}
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">📅 Added:</span> ${new Date(driver.created_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <div class="driver-actions">
+                                <button onclick="editDriverFromSearch('${driver.phone}')" class="btn-warning">✏️ Edit This Driver</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Edit driver from search results
+        function editDriverFromSearch(phone) {
+            // Find the driver in the search results
+            const driver = allDrivers.find(d => d.phone === phone);
+            if (driver) {
+                displayEditForm(driver);
+            } else {
+                // If not in allDrivers, fetch it
+                fetch(`${SUPABASE_URL}/rest/v1/drivers?phone=eq.${encodeURIComponent(phone)}`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                })
+                .then(response => response.json())
+                .then(drivers => {
+                    if (drivers.length > 0) {
+                        displayEditForm(drivers[0]);
+                    }
+                });
+            }
+        }
+
+        // Clear search results
+        function clearSearchResults() {
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('searchPhone').value = '';
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchEmail').value = '';
         }
 
         // Display Edit Form
@@ -641,7 +773,7 @@
         function editDriver(phone) {
             document.getElementById('searchPhone').value = phone;
             showTab('search');
-            searchDriver();
+            searchDriverByPhone();
         }
 
         // Toggle Driver Status
@@ -706,7 +838,5 @@
             }
         });
     </script>
-</body>
-</html> 
 </body>
 </html> 
