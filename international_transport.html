@@ -415,10 +415,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase configuration
-        const SUPABASE_URL = 'https://lzpkwwrrlfxyhvhvctmk.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6cGt3d3JybGZ4eWh2aHZjdG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExNTc5NTMsImV4cCI6MjA0NjczMzk1M30.jHmYf0mfJkwJdpZJyN6EEQH2fzlMdDWYYLU2gVOvNL8';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Supabase configuration - STANDARDIZED ACROSS ALL FILES
+        const SUPABASE_URL = 'https://ultxmlfybjoqdhmsqwek.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw';
+        
+        // FIXED: Correct Supabase client initialization
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let transitPointCount = 0;
 
@@ -438,10 +441,10 @@
             document.getElementById('destination_date').min = today;
         }
 
-        // Load drivers from database
+        // IMPROVED: Load drivers with better error handling
         async function loadDrivers() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('drivers')
                     .select('*')
                     .eq('is_active', true)
@@ -452,21 +455,28 @@
                 const primarySelect = document.getElementById('primaryDriver');
                 const secondarySelect = document.getElementById('secondaryDriver');
                 
+                // Clear existing options
+                primarySelect.innerHTML = '<option value="">Select primary driver</option>';
+                secondarySelect.innerHTML = '<option value="">No secondary driver</option>';
+                
                 data.forEach(driver => {
                     const option1 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
                     const option2 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
                     primarySelect.add(option1);
                     secondarySelect.add(option2);
                 });
+                
+                console.log(`✅ Loaded ${data.length} drivers`);
             } catch (error) {
-                console.error('Error loading drivers:', error);
+                console.error('❌ Error loading drivers:', error);
+                showMessage('Failed to load drivers. Please refresh the page.', 'error');
             }
         }
 
-        // Load trucks from database
+        // IMPROVED: Load trucks with better error handling
         async function loadTrucks() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('trucks')
                     .select('*')
                     .eq('is_active', true)
@@ -475,19 +485,24 @@
                 if (error) throw error;
 
                 const select = document.getElementById('assignedTruck');
+                select.innerHTML = '<option value="">Select truck</option>';
+                
                 data.forEach(truck => {
                     const option = new Option(`${truck.truck_number} - ${truck.make} ${truck.model}`, truck.id);
                     select.add(option);
                 });
+                
+                console.log(`✅ Loaded ${data.length} trucks`);
             } catch (error) {
-                console.error('Error loading trucks:', error);
+                console.error('❌ Error loading trucks:', error);
+                showMessage('Failed to load trucks. Please refresh the page.', 'error');
             }
         }
 
-        // Load trailers from database
+        // IMPROVED: Load trailers with better error handling
         async function loadTrailers() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('trailers')
                     .select('*')
                     .eq('is_active', true)
@@ -496,13 +511,38 @@
                 if (error) throw error;
 
                 const select = document.getElementById('assignedTrailer');
+                select.innerHTML = '<option value="">No trailer required</option>';
+                
                 data.forEach(trailer => {
                     const option = new Option(`${trailer.trailer_number} - ${trailer.type}`, trailer.id);
                     select.add(option);
                 });
+                
+                console.log(`✅ Loaded ${data.length} trailers`);
             } catch (error) {
-                console.error('Error loading trailers:', error);
+                console.error('❌ Error loading trailers:', error);
+                showMessage('Failed to load trailers. Please refresh the page.', 'error');
             }
+        }
+
+        // ADDED: Better user feedback
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 1000; 
+                padding: 15px; border-radius: 5px; max-width: 300px;
+                ${type === 'error' ? 
+                    'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;' : 
+                    'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;'
+                }
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
         }
 
         // Add transit point
@@ -572,16 +612,46 @@
             }
         }
 
-        // Form submission
+        // IMPROVED: Form submission with better UX and validation
         document.getElementById('internationalTransportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating International Plan...';
+            
+            // Validate required fields
+            if (!validateForm()) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
+            }
             
             const formData = new FormData(this);
             const planData = Object.fromEntries(formData.entries());
             
-            // Add form type identifier
+            // Add form type identifier and metadata
             planData.planType = 'international';
             planData.createdAt = new Date().toISOString();
+            planData.estimatedDays = document.getElementById('plannedDuration').value;
+            
+            // Add selected driver/vehicle details for better processing
+            const primaryDriverSelect = document.getElementById('primaryDriver');
+            const truckSelect = document.getElementById('assignedTruck');
+            const trailerSelect = document.getElementById('assignedTrailer');
+            
+            if (primaryDriverSelect.selectedIndex > 0) {
+                planData.primaryDriverName = primaryDriverSelect.options[primaryDriverSelect.selectedIndex].text;
+            }
+            if (truckSelect.selectedIndex > 0) {
+                planData.truckDetails = truckSelect.options[truckSelect.selectedIndex].text;
+            }
+            if (trailerSelect.selectedIndex > 0) {
+                planData.trailerDetails = trailerSelect.options[trailerSelect.selectedIndex].text;
+            }
             
             try {
                 // Send to n8n webhook for processing
@@ -594,17 +664,73 @@
                 });
 
                 if (response.ok) {
-                    alert('✅ International transport plan created successfully!\n\nThe plan has been processed and drivers will be notified via Telegram with detailed journey information including border crossing requirements and mandatory rest periods.');
+                    showMessage('✅ International transport plan created successfully! Drivers will be notified via Telegram with detailed journey information.', 'success');
                     this.reset();
                     setMinDates();
+                    // Clear dropdowns
+                    document.getElementById('primaryDriver').selectedIndex = 0;
+                    document.getElementById('secondaryDriver').selectedIndex = 0;
+                    document.getElementById('assignedTruck').selectedIndex = 0;
+                    document.getElementById('assignedTrailer').selectedIndex = 0;
                 } else {
-                    throw new Error('Failed to create transport plan');
+                    throw new Error(`Server error: ${response.status}`);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error creating transport plan. Please check your connection and try again.');
+                console.error('❌ Form submission error:', error);
+                showMessage('❌ Error creating transport plan. Please check your connection and try again.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
         });
+
+        // ADDED: Form validation
+        function validateForm() {
+            const requiredFields = [
+                { id: 'journeyDate', name: 'Journey Date' },
+                { id: 'plannedDuration', name: 'Planned Duration' },
+                { id: 'journeyType', name: 'Journey Type' },
+                { id: 'primaryDriver', name: 'Primary Driver' },
+                { id: 'assignedTruck', name: 'Assigned Truck' },
+                { id: 'origin_country', name: 'Origin Country' },
+                { id: 'origin_city', name: 'Origin City' },
+                { id: 'origin_date', name: 'Loading Date' },
+                { id: 'origin_address', name: 'Origin Address' },
+                { id: 'destination_country', name: 'Destination Country' },
+                { id: 'destination_city', name: 'Destination City' },
+                { id: 'destination_date', name: 'Delivery Date' },
+                { id: 'destination_address', name: 'Destination Address' },
+                { id: 'cargoType', name: 'Cargo Type' },
+                { id: 'cargoWeight', name: 'Cargo Weight' }
+            ];
+
+            for (let field of requiredFields) {
+                const element = document.getElementById(field.id);
+                if (!element.value.trim()) {
+                    showMessage(`❌ Please fill in: ${field.name}`, 'error');
+                    element.focus();
+                    return false;
+                }
+            }
+
+            // Validate dates
+            const originDate = new Date(document.getElementById('origin_date').value);
+            const destinationDate = new Date(document.getElementById('destination_date').value);
+            const journeyDate = new Date(document.getElementById('journeyDate').value);
+
+            if (originDate >= destinationDate) {
+                showMessage('❌ Delivery date must be after loading date', 'error');
+                return false;
+            }
+
+            if (journeyDate > originDate) {
+                showMessage('❌ Journey start date cannot be after loading date', 'error');
+                return false;
+            }
+
+            return true;
+        }
 
         // Auto-calculate estimated duration based on countries
         function updateEstimatedDuration() {
@@ -634,4 +760,5 @@
         document.getElementById('plannedDuration').addEventListener('change', updateEstimatedDuration);
     </script>
 </body>
+</html> 
 </html> 
