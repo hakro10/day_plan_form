@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transport Planning</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f0f8ff; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; color: #333; }
+        .header h1 { color: #1e90ff; margin-bottom: 10px; }
+        .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
+        .section h3 { color: #1e90ff; margin-bottom: 15px; border-bottom: 2px solid #1e90ff; padding-bottom: 5px; }
+        .form-group { margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { border-color: #1e90ff; outline: none; }
+        .required { color: #dc3545; }
+        .priority-select { padding: 8px; border: 2px solid #1e90ff; border-radius: 5px; background: white; }
+        .route-point { background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid #1e90ff; }
+        .add-point-btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
+        .remove-point-btn { background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; float: right; }
+        .submit-btn { background: #1e90ff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 20px; }
+        .submit-btn:hover { background: #0066cc; }
+        .nav-links { margin-bottom: 20px; text-align: center; }
+        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #1e90ff; text-decoration: none; border-radius: 5px; border: 1px solid #1e90ff; }
+        .nav-links a:hover { background: #1e90ff; color: white; }
+        .compliance-warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .compliance-warning h4 { color: #856404; margin-bottom: 10px; }
+        .driver-rest { background: #e8f5e8; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .customs-docs { background: #fff8e1; padding: 15px; border-radius: 5px; }
+        .estimated-duration { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 10px; font-weight: bold; color: #1976d2; }
+        @media (max-width: 768px) {
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+            .nav-links a { display: block; margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="transport_form_local.html">🚛 Local Planning</a>
+        <a href="fleet_management.html">👥 Fleet Management</a>
+        <a href="add_truck.html">➕ Add Truck</a>
+        <a href="add_trailer.html">🚚 Add Trailer</a>
+        <a href="pod_upload.html">📋 POD Upload</a>
+    </div>
+
+    <div class="form-container">
+        <div class="header">
+            <h1>🌍 International Transport Planning</h1>
+            <p>Multi-day cross-border journey planning with EU compliance</p>
+        </div>
+
+        <form id="internationalTransportForm">
+            <!-- Journey Information Section -->
+            <div class="section">
+                <h3>📅 Journey Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="journeyDate">Journey Start Date <span class="required">*</span></label>
+                        <input type="date" id="journeyDate" name="journeyDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plannedDuration">Planned Duration (days) <span class="required">*</span></label>
+                        <input type="number" id="plannedDuration" name="plannedDuration" min="1" max="14" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="journeyType">Journey Type <span class="required">*</span></label>
+                        <select id="journeyType" name="journeyType" required>
+                            <option value="">Select journey type</option>
+                            <option value="export">Export (Outbound)</option>
+                            <option value="import">Import (Inbound)</option>
+                            <option value="transit">Transit (Through)</option>
+                            <option value="cabotage">Cabotage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority Level</label>
+                        <select id="priority" name="priority" class="priority-select">
+                            <option value="standard">Standard</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="express">Express</option>
+                            <option value="economy">Economy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="compliance-warning">
+                    <h4>⚠️ EU Compliance Requirements</h4>
+                    <ul>
+                        <li><strong>Driving Time:</strong> Maximum 13 hours per day</li>
+                        <li><strong>Rest Period:</strong> Minimum 8 hours between driving periods</li>
+                        <li><strong>Weekly Rest:</strong> 45 hours continuous rest per week</li>
+                        <li><strong>Daily Driving:</strong> Maximum 10 hours (can be extended to 12h twice per week)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Driver & Vehicle Assignment -->
+            <div class="section">
+                <h3>👥 Driver & Vehicle Assignment</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="primaryDriver">Primary Driver <span class="required">*</span></label>
+                        <select id="primaryDriver" name="primaryDriver" required>
+                            <option value="">Select primary driver</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="secondaryDriver">Secondary Driver (Team Driving)</label>
+                        <select id="secondaryDriver" name="secondaryDriver">
+                            <option value="">No secondary driver</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="assignedTruck">Assigned Truck <span class="required">*</span></label>
+                        <select id="assignedTruck" name="assignedTruck" required>
+                            <option value="">Select truck</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignedTrailer">Assigned Trailer</label>
+                        <select id="assignedTrailer" name="assignedTrailer">
+                            <option value="">No trailer required</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="driver-rest">
+                    <label>
+                        <input type="checkbox" id="teamDriving" name="teamDriving"> 
+                        Enable team driving (allows continuous 24h operation with proper rest periods)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Route Planning -->
+            <div class="section">
+                <h3>🗺️ Route Planning</h3>
+                <div id="routePoints">
+                    <div class="route-point">
+                        <h4>📍 Origin (Loading Point)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="origin_country">Country <span class="required">*</span></label>
+                                <select id="origin_country" name="origin_country" required>
+                                    <option value="">Select country</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="BG">Bulgaria</option>
+                                    <option value="HR">Croatia</option>
+                                    <option value="CZ">Czech Republic</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="EE">Estonia</option>
+                                    <option value="FI">Finland</option>
+                                    <option value="FR">France</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="GR">Greece</option>
+                                    <option value="HU">Hungary</option>
+                                    <option value="IE">Ireland</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="LV">Latvia</option>
+                                    <option value="LT">Lithuania</option>
+                                    <option value="LU">Luxembourg</option>
+                                    <option value="MT">Malta</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="PL">Poland</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="RO">Romania</option>
+                                    <option value="SK">Slovakia</option>
+                                    <option value="SI">Slovenia</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="UK">United Kingdom</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="origin_city">City <span class="required">*</span></label>
+                                <input type="text" id="origin_city" name="origin_city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="origin_date">Loading Date <span class="required">*</span></label>
+                                <input type="date" id="origin_date" name="origin_date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="origin_address">Full Address <span class="required">*</span></label>
+                            <textarea id="origin_address" name="origin_address" rows="2" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="origin_contact">Contact Person</label>
+                                <input type="text" id="origin_contact" name="origin_contact">
+                            </div>
+                            <div class="form-group">
+                                <label for="origin_phone">Contact Phone</label>
+                                <input type="tel" id="origin_phone" name="origin_phone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="route-point">
+                        <h4>🎯 Destination (Delivery Point)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="destination_country">Country <span class="required">*</span></label>
+                                <select id="destination_country" name="destination_country" required>
+                                    <option value="">Select country</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="BG">Bulgaria</option>
+                                    <option value="HR">Croatia</option>
+                                    <option value="CZ">Czech Republic</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="EE">Estonia</option>
+                                    <option value="FI">Finland</option>
+                                    <option value="FR">France</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="GR">Greece</option>
+                                    <option value="HU">Hungary</option>
+                                    <option value="IE">Ireland</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="LV">Latvia</option>
+                                    <option value="LT">Lithuania</option>
+                                    <option value="LU">Luxembourg</option>
+                                    <option value="MT">Malta</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="PL">Poland</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="RO">Romania</option>
+                                    <option value="SK">Slovakia</option>
+                                    <option value="SI">Slovenia</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="UK">United Kingdom</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="destination_city">City <span class="required">*</span></label>
+                                <input type="text" id="destination_city" name="destination_city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="destination_date">Delivery Date <span class="required">*</span></label>
+                                <input type="date" id="destination_date" name="destination_date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination_address">Full Address <span class="required">*</span></label>
+                            <textarea id="destination_address" name="destination_address" rows="2" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="destination_contact">Contact Person</label>
+                                <input type="text" id="destination_contact" name="destination_contact">
+                            </div>
+                            <div class="form-group">
+                                <label for="destination_phone">Contact Phone</label>
+                                <input type="tel" id="destination_phone" name="destination_phone">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="add-point-btn" onclick="addTransitPoint()">+ Add Transit Stop</button>
+                
+                <div class="estimated-duration" id="estimatedDuration">
+                    📊 Estimated journey duration will be calculated based on route and mandatory rest periods
+                </div>
+            </div>
+
+            <!-- Cargo Information -->
+            <div class="section">
+                <h3>📦 Cargo Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cargoType">Cargo Type <span class="required">*</span></label>
+                        <select id="cargoType" name="cargoType" required>
+                            <option value="">Select cargo type</option>
+                            <option value="general">General Cargo</option>
+                            <option value="food">Food & Beverages</option>
+                            <option value="automotive">Automotive Parts</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="textiles">Textiles</option>
+                            <option value="chemicals">Chemicals (Non-hazardous)</option>
+                            <option value="machinery">Machinery</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="hazmat">Hazardous Materials (ADR)</option>
+                            <option value="refrigerated">Refrigerated Goods</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cargoWeight">Total Weight (kg) <span class="required">*</span></label>
+                        <input type="number" id="cargoWeight" name="cargoWeight" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="cargoValue">Cargo Value (EUR)</label>
+                        <input type="number" id="cargoValue" name="cargoValue" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="packages">Number of Packages</label>
+                        <input type="number" id="packages" name="packages" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="pallets">Number of Pallets</label>
+                        <input type="number" id="pallets" name="pallets" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cargoDescription">Detailed Cargo Description</label>
+                    <textarea id="cargoDescription" name="cargoDescription" rows="3" placeholder="Provide detailed description for customs documentation..."></textarea>
+                </div>
+            </div>
+
+            <!-- Customs & Documentation -->
+            <div class="section">
+                <h3>📋 Customs & Documentation</h3>
+                <div class="customs-docs">
+                    <h4>Required Documents Checklist:</h4>
+                    <div class="form-row">
+                        <div>
+                            <label><input type="checkbox" name="docs_cmr"> CMR International Consignment Note</label><br>
+                            <label><input type="checkbox" name="docs_invoice"> Commercial Invoice</label><br>
+                            <label><input type="checkbox" name="docs_packing"> Packing List</label><br>
+                            <label><input type="checkbox" name="docs_export"> Export License</label><br>
+                        </div>
+                        <div>
+                            <label><input type="checkbox" name="docs_import"> Import License</label><br>
+                            <label><input type="checkbox" name="docs_tir"> TIR Carnet (if applicable)</label><br>
+                            <label><input type="checkbox" name="docs_insurance"> Cargo Insurance</label><br>
+                            <label><input type="checkbox" name="docs_adr"> ADR Certificate (hazardous goods)</label><br>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customsCode">HS Customs Code</label>
+                        <input type="text" id="customsCode" name="customsCode" placeholder="e.g., 8703.24.90">
+                    </div>
+                    <div class="form-group">
+                        <label for="incoterms">Incoterms</label>
+                        <select id="incoterms" name="incoterms">
+                            <option value="">Select Incoterms</option>
+                            <option value="EXW">EXW - Ex Works</option>
+                            <option value="FCA">FCA - Free Carrier</option>
+                            <option value="CPT">CPT - Carriage Paid To</option>
+                            <option value="CIP">CIP - Carriage Insurance Paid</option>
+                            <option value="DAP">DAP - Delivered at Place</option>
+                            <option value="DPU">DPU - Delivered at Place Unloaded</option>
+                            <option value="DDP">DDP - Delivered Duty Paid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialInstructions">Special Instructions / Border Requirements</label>
+                    <textarea id="specialInstructions" name="specialInstructions" rows="3" placeholder="Special handling, border crossing requirements, customs procedures..."></textarea>
+                </div>
+            </div>
+
+            <!-- Communication Settings -->
+            <div class="section">
+                <h3>📱 Communication & Tracking</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sendTelegram" name="sendTelegram" checked> 
+                        Send detailed plan to driver via Telegram
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="dailyUpdates" name="dailyUpdates" checked> 
+                        Request daily progress updates from driver
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="borderNotifications" name="borderNotifications" checked> 
+                        Send notifications at border crossings
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="customerUpdates" name="customerUpdates"> 
+                        Send progress updates to customer
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additionalContacts">Additional Notification Contacts</label>
+                    <textarea id="additionalContacts" name="additionalContacts" rows="2" placeholder="Additional email addresses or phone numbers for notifications..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">🌍 Create International Transport Plan</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://lzpkwwrrlfxyhvhvctmk.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6cGt3d3JybGZ4eWh2aHZjdG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExNTc5NTMsImV4cCI6MjA0NjczMzk1M30.jHmYf0mfJkwJdpZJyN6EEQH2fzlMdDWYYLU2gVOvNL8';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let transitPointCount = 0;
+
+        // Load drivers, trucks, and trailers on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadDrivers();
+            await loadTrucks();
+            await loadTrailers();
+            setMinDates();
+        });
+
+        // Set minimum dates to today
+        function setMinDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('journeyDate').min = today;
+            document.getElementById('origin_date').min = today;
+            document.getElementById('destination_date').min = today;
+        }
+
+        // Load drivers from database
+        async function loadDrivers() {
+            try {
+                const { data, error } = await supabase
+                    .from('drivers')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('name');
+
+                if (error) throw error;
+
+                const primarySelect = document.getElementById('primaryDriver');
+                const secondarySelect = document.getElementById('secondaryDriver');
+                
+                data.forEach(driver => {
+                    const option1 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
+                    const option2 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
+                    primarySelect.add(option1);
+                    secondarySelect.add(option2);
+                });
+            } catch (error) {
+                console.error('Error loading drivers:', error);
+            }
+        }
+
+        // Load trucks from database
+        async function loadTrucks() {
+            try {
+                const { data, error } = await supabase
+                    .from('trucks')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('truck_number');
+
+                if (error) throw error;
+
+                const select = document.getElementById('assignedTruck');
+                data.forEach(truck => {
+                    const option = new Option(`${truck.truck_number} - ${truck.make} ${truck.model}`, truck.id);
+                    select.add(option);
+                });
+            } catch (error) {
+                console.error('Error loading trucks:', error);
+            }
+        }
+
+        // Load trailers from database
+        async function loadTrailers() {
+            try {
+                const { data, error } = await supabase
+                    .from('trailers')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('trailer_number');
+
+                if (error) throw error;
+
+                const select = document.getElementById('assignedTrailer');
+                data.forEach(trailer => {
+                    const option = new Option(`${trailer.trailer_number} - ${trailer.type}`, trailer.id);
+                    select.add(option);
+                });
+            } catch (error) {
+                console.error('Error loading trailers:', error);
+            }
+        }
+
+        // Add transit point
+        function addTransitPoint() {
+            transitPointCount++;
+            const routePoints = document.getElementById('routePoints');
+            
+            const transitHtml = `
+                <div class="route-point" id="transit_${transitPointCount}">
+                    <button type="button" class="remove-point-btn" onclick="removeTransitPoint(${transitPointCount})">Remove</button>
+                    <h4>🚩 Transit Stop ${transitPointCount}</h4>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Country</label>
+                            <select name="transit_${transitPointCount}_country">
+                                <option value="">Select country</option>
+                                <option value="AT">Austria</option>
+                                <option value="BE">Belgium</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="IT">Italy</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="PL">Poland</option>
+                                <option value="ES">Spain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="transit_${transitPointCount}_city">
+                        </div>
+                        <div class="form-group">
+                            <label>Stop Type</label>
+                            <select name="transit_${transitPointCount}_type">
+                                <option value="rest">Driver Rest Stop</option>
+                                <option value="fuel">Fuel Stop</option>
+                                <option value="customs">Customs Check</option>
+                                <option value="delivery">Additional Delivery</option>
+                                <option value="pickup">Additional Pickup</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea name="transit_${transitPointCount}_address" rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Planned Arrival</label>
+                            <input type="datetime-local" name="transit_${transitPointCount}_arrival">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (hours)</label>
+                            <input type="number" name="transit_${transitPointCount}_duration" min="0.5" step="0.5" value="8">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            routePoints.insertAdjacentHTML('beforeend', transitHtml);
+        }
+
+        // Remove transit point
+        function removeTransitPoint(pointId) {
+            const element = document.getElementById(`transit_${pointId}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // Form submission
+        document.getElementById('internationalTransportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const planData = Object.fromEntries(formData.entries());
+            
+            // Add form type identifier
+            planData.planType = 'international';
+            planData.createdAt = new Date().toISOString();
+            
+            try {
+                // Send to n8n webhook for processing
+                const response = await fetch('https://hakro.app.n8n.cloud/webhook/international-transport-plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(planData)
+                });
+
+                if (response.ok) {
+                    alert('✅ International transport plan created successfully!\n\nThe plan has been processed and drivers will be notified via Telegram with detailed journey information including border crossing requirements and mandatory rest periods.');
+                    this.reset();
+                    setMinDates();
+                } else {
+                    throw new Error('Failed to create transport plan');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error creating transport plan. Please check your connection and try again.');
+            }
+        });
+
+        // Auto-calculate estimated duration based on countries
+        function updateEstimatedDuration() {
+            const originCountry = document.getElementById('origin_country').value;
+            const destinationCountry = document.getElementById('destination_country').value;
+            const duration = document.getElementById('plannedDuration').value;
+            
+            if (originCountry && destinationCountry && duration) {
+                const estimatedDiv = document.getElementById('estimatedDuration');
+                const days = parseInt(duration);
+                const drivingHours = days * 13; // Max 13h driving per day
+                const restHours = (days - 1) * 8; // 8h rest between days
+                
+                estimatedDiv.innerHTML = `
+                    📊 <strong>Journey Estimate:</strong><br>
+                    🚛 Maximum driving time: ${drivingHours} hours over ${days} days<br>
+                    🛏️ Mandatory rest periods: ${restHours} hours<br>
+                    🌍 Route: ${originCountry} → ${destinationCountry}<br>
+                    ⚠️ Allow extra time for border crossings and customs procedures
+                `;
+            }
+        }
+
+        // Add event listeners for duration calculation
+        document.getElementById('origin_country').addEventListener('change', updateEstimatedDuration);
+        document.getElementById('destination_country').addEventListener('change', updateEstimatedDuration);
+        document.getElementById('plannedDuration').addEventListener('change', updateEstimatedDuration);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Planning Dashboard</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #333;
+        }
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+        .planning-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .planning-card {
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .planning-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .local-card {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+        }
+        .local-card:hover {
+            border-color: #218838;
+        }
+        .international-card {
+            border-color: #1e90ff;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        }
+        .international-card:hover {
+            border-color: #0066cc;
+        }
+        .card-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .local-card .card-title {
+            color: #28a745;
+        }
+        .international-card .card-title {
+            color: #1e90ff;
+        }
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .card-features {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .card-features li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .management-section {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 40px;
+        }
+        .management-title {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+        }
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .management-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+        .management-item:hover {
+            border-color: #6c757d;
+            background: #f1f3f4;
+            transform: translateY(-2px);
+        }
+        .management-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #6c757d;
+        }
+        .management-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .management-desc {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-beta {
+            background: #fff3cd;
+            color: #856404;
+        }
+        @media (max-width: 768px) {
+            .planning-options {
+                grid-template-columns: 1fr;
+            }
+            .management-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚛 Transport Planning Dashboard</h1>
+            <p>Fleet Management & Route Planning System</p>
+        </div>
+        
+        <div class="planning-options">
+            <a href="transport_form_local.html" class="planning-card local-card">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">Local Transport Planning</div>
+                <div class="card-description">
+                    Plan daily routes with precise time windows for same-day deliveries and collections within your region.
+                </div>
+                <ul class="card-features">
+                    <li>✅ Hourly time scheduling</li>
+                    <li>✅ Multiple collection/delivery points</li>
+                    <li>✅ Priority-based routing</li>
+                    <li>✅ Same-day return to depot</li>
+                    <li>✅ Real-time driver notifications</li>
+                </ul>
+                <div class="status-badge status-ready">READY TO USE</div>
+            </a>
+            
+            <a href="international_transport.html" class="planning-card international-card">
+                <div class="card-icon">🌍</div>
+                <div class="card-title">International Transport Planning</div>
+                <div class="card-description">
+                    Plan multi-day cross-border journeys with customs documentation and driver rest period management.
+                </div>
+                <ul class="card-features">
+                    <li>🌍 Multi-country routing</li>
+                    <li>📋 Customs documentation tracking</li>
+                    <li>🛏️ Driver rest period compliance</li>
+                    <li>👥 Team driver coordination</li>
+                    <li>🔔 Border crossing notifications</li>
+                </ul>
+                <div class="status-badge status-beta">BETA VERSION</div>
+            </a>
+        </div>
+        
+        <div class="management-section">
+            <h2 class="management-title">Fleet Management & Administration</h2>
+            <div class="management-grid">
+                <a href="fleet_management.html" class="management-item">
+                    <div class="management-icon">👥</div>
+                    <div class="management-name">Driver Management</div>
+                    <div class="management-desc">Add, edit, and manage driver information, contact details, and status</div>
+                </a>
+                
+                <a href="add_truck.html" class="management-item">
+                    <div class="management-icon">🚛</div>
+                    <div class="management-name">Add New Truck</div>
+                    <div class="management-desc">Register new trucks in the fleet with specifications and documentation</div>
+                </a>
+                
+                <a href="add_trailer.html" class="management-item">
+                    <div class="management-icon">🚚</div>
+                    <div class="management-name">Add New Trailer</div>
+                    <div class="management-desc">Register new trailers with capacity, type, and dimension information</div>
+                </a>
+                
+                <a href="pod_upload.html" class="management-item">
+                    <div class="management-icon">📋</div>
+                    <div class="management-name">POD Upload</div>
+                    <div class="management-desc">Upload proof of delivery documents with photos and signatures</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
