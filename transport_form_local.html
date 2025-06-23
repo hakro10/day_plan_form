@@ -563,7 +563,7 @@
             collectionCount = 0;
             deliveryCount = 0;
 
-            // Mock Collection Points
+            // Mock Collection Points - Based on actual plan data
             const mockCollections = [
                 {
                     address: 'NB Warehouse, Industrial Estate, Dublin',
@@ -579,7 +579,7 @@
                     timeTo: '10:00',
                     contact: 'Mary O\'Connor - 086-9876543',
                     duration: '90',
-                    notes: 'Collect frozen goods, temperature -18°C'
+                    notes: 'Collect frozen goods; temperature -18°C'
                 },
                 {
                     address: 'GXO Logistics, Portlaoise',
@@ -587,7 +587,7 @@
                     timeTo: '12:00',
                     contact: 'Pat Murphy - 085-5555555',
                     duration: '60',
-                    notes: 'Load palletized goods, dock 7'
+                    notes: 'Load Trucking for kepak cork'
                 },
                 {
                     address: 'Kepak Cork Processing Plant',
@@ -595,7 +595,7 @@
                     timeTo: '14:00',
                     contact: 'Sean Kelly - 087-7777777',
                     duration: '60',
-                    notes: 'Collect meat products, chilled transport'
+                    notes: 'Collect meat products, chilled transport for kepak'
                 },
                 {
                     address: 'Kingsgate Portlaoise Distribution',
@@ -603,20 +603,20 @@
                     timeTo: '16:00',
                     contact: 'Lisa Ryan - 086-3333333',
                     duration: '60',
-                    notes: 'Collect retail goods for final delivery'
+                    notes: 'Collect tesco goods for final delivery'
                 }
             ];
 
-            // Mock Delivery Points
+            // Mock Delivery Points - Based on actual plan data
             const mockDeliveries = [
                 {
                     address: 'Kepak Cork Retail Store',
                     timeFrom: '14:00',
                     timeTo: '15:00',
                     contact: 'Mike O\'Brien - 087-8888888',
-                    duration: '60',
+                    duration: '20',
                     priority: 'high',
-                    notes: 'Unload fresh creates, priority delivery'
+                    notes: 'Unload creates'
                 },
                 {
                     address: 'NB Return Depot, Dispatch Bay',
@@ -658,7 +658,7 @@
                 currentPoint.querySelector('textarea[name="deliveryNotes[]"]').value = delivery.notes;
             });
 
-            // Additional Instructions
+            // Additional Instructions - Based on actual plan data
             document.getElementById('routeInstructions').value = 'Avoid N7 construction zone. Use M50 route. Mandatory 45min break after Portlaoise collection.';
             document.getElementById('fuelStops').value = 'if_needed';
             document.getElementById('returnToDepot').value = 'same_day';
