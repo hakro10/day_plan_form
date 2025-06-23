@@ -15,8 +15,8 @@ const mockTransportData = {
   // Collection Points (5 stops)
   collectionAddress: [
     "NB Warehouse, Citywest",
-    "K&N Distribution Center, Portlaoise", 
-    "GXO Logistics, Naas",
+    "K&N Distribution Center, Swords", 
+    "GXO Logistics, Swords",
     "Kepak Cork Processing Plant",
     "Kingsgate Portlaoise Distribution"
   ],
@@ -53,7 +53,7 @@ const mockTransportData = {
   ],
   deliveryDuration: [30, 20],
   deliverySpecialInstructions: [
-    "UNLOAD 6 CRATES",
+    "UNLOAD CRATES",
     "Drop trailer at dispatch bay, return unladen"
   ],
   
