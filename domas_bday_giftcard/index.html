@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Happy 10th Birthday Domas! 🎉</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Page 1: Welcome -->
+    <div id="page1" class="page active">
+        <div class="confetti-container"></div>
+        <div class="welcome-content">
+            <h1 class="big-title">🎂 HAPPY BIRTHDAY 🎂</h1>
+            <h2 class="name-title">DOMAS!</h2>
+            <div class="age-badge">
+                <span class="age-number">10</span>
+                <span class="age-text">YEARS OLD!</span>
+            </div>
+            <div class="balloons">
+                <div class="balloon balloon1">🎈</div>
+                <div class="balloon balloon2">🎈</div>
+                <div class="balloon balloon3">🎈</div>
+                <div class="balloon balloon4">🎈</div>
+                <div class="balloon balloon5">🎈</div>
+            </div>
+            <button class="next-btn" onclick="goToPage(2)">Let's Celebrate! 🎉</button>
+        </div>
+    </div>
+
+    <!-- Page 2: Present Opening -->
+    <div id="page2" class="page">
+        <div class="present-page">
+            <h2>🎁 Choose Your Present! 🎁</h2>
+            <div class="presents-container">
+                <div class="present-box" id="present1" onclick="openPresent(1)">
+                    <div class="present-lid"></div>
+                    <div class="present-body"></div>
+                    <div class="present-ribbon-v"></div>
+                    <div class="present-ribbon-h"></div>
+                    <div class="present-bow"></div>
+                </div>
+                <div class="present-box" id="present2" onclick="openPresent(2)">
+                    <div class="present-lid"></div>
+                    <div class="present-body"></div>
+                    <div class="present-ribbon-v"></div>
+                    <div class="present-ribbon-h"></div>
+                    <div class="present-bow"></div>
+                </div>
+                <div class="present-box" id="present3" onclick="openPresent(3)">
+                    <div class="present-lid"></div>
+                    <div class="present-body"></div>
+                    <div class="present-ribbon-v"></div>
+                    <div class="present-ribbon-h"></div>
+                    <div class="present-bow"></div>
+                </div>
+            </div>
+            <div id="present-surprise" class="surprise-content"></div>
+            <button class="next-btn" onclick="goToPage(3)" style="display: none;" id="toPage3">More Fun! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Page 3: Birthday Cake -->
+    <div id="page3" class="page">
+        <div class="cake-page">
+            <h2>🕯️ Make a Wish and Blow the Candles! 🕯️</h2>
+            <div class="cake-container">
+                <div class="cake">
+                    <div class="cake-layer cake-top">
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                        <div class="candle" data-lit="true">
+                            <div class="flame"></div>
+                            <div class="wick"></div>
+                        </div>
+                    </div>
+                    <div class="cake-layer cake-middle"></div>
+                    <div class="cake-layer cake-bottom"></div>
+                </div>
+            </div>
+            <p class="blow-instruction">Click on the candles to blow them out! 💨</p>
+            <div id="wish-message" class="wish-message" style="display: none;">
+                <h3>🌟 Your wish has been made! 🌟</h3>
+                <p>May all your dreams come true, Domas! 💫</p>
+            </div>
+            <button class="next-btn" onclick="goToPage(4)" style="display: none;" id="toPage4">Let's Party! 🎊</button>
+        </div>
+    </div>
+
+    <!-- Page 4: Fun Activities -->
+    <div id="page4" class="page">
+        <div class="activities-page">
+            <h2>🎮 Birthday Fun Zone! 🎮</h2>
+            <div class="activities-grid">
+                <div class="activity-card" onclick="startBalloonPop()">
+                    <h3>🎈 Balloon Pop</h3>
+                    <p>Pop the balloons!</p>
+                </div>
+                <div class="activity-card" onclick="startEmojiRain()">
+                    <h3>🌈 Emoji Rain</h3>
+                    <p>Make it rain emojis!</p>
+                </div>
+                <div class="activity-card" onclick="startColorChange()">
+                    <h3>🎨 Color Magic</h3>
+                    <p>Change the colors!</p>
+                </div>
+                <div class="activity-card" onclick="startFireworks()">
+                    <h3>🎆 Fireworks</h3>
+                    <p>Light up the sky!</p>
+                </div>
+            </div>
+            <div id="activity-area" class="activity-area"></div>
+            <button class="next-btn" onclick="goToPage(5)">Final Surprise! ✨</button>
+        </div>
+    </div>
+
+    <!-- Page 5: Final Message -->
+    <div id="page5" class="page">
+        <div class="final-page">
+            <div class="heart-container">
+                <div class="heart">❤️</div>
+            </div>
+            <h2>🎉 Happy 10th Birthday, Domas! 🎉</h2>
+            <div class="final-message">
+                <p>You're growing up to be such an amazing kid!</p>
+                <p>May this new year of your life be filled with:</p>
+                <div class="wishes-list">
+                    <div class="wish-item">🎮 Fun adventures</div>
+                    <div class="wish-item">📚 New discoveries</div>
+                    <div class="wish-item">👫 Great friendships</div>
+                    <div class="wish-item">😄 Lots of laughter</div>
+                    <div class="wish-item">🌟 Amazing memories</div>
+                </div>
+                <p class="love-message">With lots of love! 💕</p>
+            </div>
+            <button class="restart-btn" onclick="goToPage(1)">Celebrate Again! 🔄</button>
+        </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div id="floating-emojis"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
