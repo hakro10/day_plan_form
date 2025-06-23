@@ -1,7 +1,7 @@
 // Mock data that matches the current transport plan form exactly
 const mockTransportData = {
   // Route Information
-  routeDate: "2025-06-23",
+  routeDate: "2025-02-23",
   routeType: "mixed_route",
   startTime: "06:00",
   expectedEndTime: "18:00",
@@ -14,15 +14,23 @@ const mockTransportData = {
   
   // Collection Points (5 stops)
   collectionAddress: [
-    "NB Warehouse, Industrial Estate, Dublin",
-    "K&N Distribution Center, Cork Road", 
-    "GXO Logistics, Portlaoise",
+    "NB Warehouse, Citywest",
+    "K&N Distribution Center, Portlaoise", 
+    "GXO Logistics, Naas",
     "Kepak Cork Processing Plant",
     "Kingsgate Portlaoise Distribution"
   ],
   collectionTimeFrom: ["07:00", "08:30", "11:00", "13:00", "15:00"],
   collectionTimeTo: ["07:30", "10:00", "12:00", "14:00", "16:00"],
   collectionPriority: ["medium", "medium", "medium", "medium", "medium"],
+  collectionContact: [
+    "John Byrne - 087-1234567",
+    "Mary O'Connor - 086-9876543",
+    "Pat Murphy - 085-5555555",
+    "Tom Kelly - 087-7777777",
+    "Joe Ryan - 086-3333333"
+  ],
+  collectionDuration: [30, 60, 45, 30, 45],
   collectionSpecialInstructions: [
     "Take empty trailer",
     "Collect empty crates for Kepak, Cork", 
@@ -33,14 +41,19 @@ const mockTransportData = {
   
   // Delivery Points (2 stops)
   deliveryAddress: [
-    "Kepak Cork Retail Store",
+    "Kepak Cork",
     "NB Return Depot, Dispatch Bay"
   ],
   deliveryTimeFrom: ["14:00", "20:00"],
   deliveryTimeTo: ["15:00", "20:30"],
   deliveryPriority: ["high", "medium"],
+  deliveryContact: [
+    "Mike O'Brien - 021-4444444",
+    "Night Supervisor - 087-9999999"
+  ],
+  deliveryDuration: [30, 20],
   deliverySpecialInstructions: [
-    "Unload 6 CRATES",
+    "UNLOAD 6 CRATES",
     "Drop trailer at dispatch bay, return unladen"
   ],
   
