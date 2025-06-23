@@ -523,27 +523,37 @@
             document.getElementById('startTime').value = '06:00';
             document.getElementById('expectedEndTime').value = '18:00';
 
-            // Wait for data to load, then select vehicles and driver
+            // Wait for data to load, then select specific vehicles and driver
             setTimeout(() => {
-                // Select first available truck if exists
+                // Select truck "231" from dropdown
                 const truckSelect = document.getElementById('truckSelect');
-                if (truckSelect.options.length > 1) {
-                    truckSelect.selectedIndex = 1;
-                    truckSelect.dispatchEvent(new Event('change'));
+                for (let i = 0; i < truckSelect.options.length; i++) {
+                    if (truckSelect.options[i].text.includes('231')) {
+                        truckSelect.selectedIndex = i;
+                        truckSelect.dispatchEvent(new Event('change'));
+                        break;
+                    }
                 }
 
-                // Select first available trailer if exists
+                // Select trailer "kt 798" from dropdown
                 const trailerSelect = document.getElementById('trailerSelect');
-                if (trailerSelect.options.length > 1) {
-                    trailerSelect.selectedIndex = 1;
-                    trailerSelect.dispatchEvent(new Event('change'));
+                for (let i = 0; i < trailerSelect.options.length; i++) {
+                    if (trailerSelect.options[i].text.toLowerCase().includes('kt 798') || 
+                        trailerSelect.options[i].text.toLowerCase().includes('kt798')) {
+                        trailerSelect.selectedIndex = i;
+                        trailerSelect.dispatchEvent(new Event('change'));
+                        break;
+                    }
                 }
 
-                // Select first available driver if exists
+                // Select driver "Auris" from dropdown
                 const driverSelect = document.getElementById('driverName');
-                if (driverSelect.options.length > 1) {
-                    driverSelect.selectedIndex = 1;
-                    driverSelect.dispatchEvent(new Event('change'));
+                for (let i = 0; i < driverSelect.options.length; i++) {
+                    if (driverSelect.options[i].text.toLowerCase().includes('auris')) {
+                        driverSelect.selectedIndex = i;
+                        driverSelect.dispatchEvent(new Event('change'));
+                        break;
+                    }
                 }
             }, 500);
 
