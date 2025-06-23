@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Trailer</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; color: #333; }
+        .header h1 { color: #6f42c1; margin-bottom: 10px; }
+        .nav-links { margin-bottom: 20px; text-align: center; }
+        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #6f42c1; text-decoration: none; border-radius: 5px; border: 1px solid #6f42c1; }
+        .nav-links a:hover { background: #6f42c1; color: white; }
+        .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
+        .section h3 { color: #6f42c1; margin-bottom: 15px; border-bottom: 2px solid #6f42c1; padding-bottom: 5px; }
+        .form-group { margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { border-color: #6f42c1; outline: none; }
+        .required { color: #dc3545; }
+        .submit-btn { background: #6f42c1; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 20px; }
+        .submit-btn:hover { background: #5a32a3; }
+        .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #c3e6cb; display: none; }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="transport_form_local.html">🚛 Local Planning</a>
+        <a href="international_transport.html">🌍 International Planning</a>
+        <a href="fleet_management.html">👥 Fleet Management</a>
+        <a href="add_truck.html">➕ Add Truck</a>
+        <a href="pod_upload.html">📋 POD Upload</a>
+    </div>
+
+    <div class="form-container">
+        <div class="header">
+            <h1>🚚 Add New Trailer</h1>
+            <p>Add trailers and semi-trailers to inventory</p>
+        </div>
+
+        <div id="messageArea"></div>
+
+        <form id="addTrailerForm">
+            <div class="section">
+                <h3>🚚 Trailer Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registration">Registration Number <span class="required">*</span></label>
+                        <input type="text" id="registration" name="registration" placeholder="e.g., KT 798" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="trailerType">Trailer Type <span class="required">*</span></label>
+                        <select id="trailerType" name="trailerType" required>
+                            <option value="">Select trailer type</option>
+                            <option value="semi-trailer">Semi-trailer</option>
+                            <option value="box-trailer">Box Trailer</option>
+                            <option value="flatbed">Flatbed Trailer</option>
+                            <option value="refrigerated">Refrigerated Trailer</option>
+                            <option value="tanker">Tanker Trailer</option>
+                            <option value="car-carrier">Car Carrier</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="make">Make <span class="required">*</span></label>
+                        <input type="text" id="make" name="make" placeholder="e.g., Krone, Schmitz, Kögel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Model</label>
+                        <input type="text" id="model" name="model" placeholder="e.g., Dry Liner, Cool Liner">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year">Year <span class="required">*</span></label>
+                        <input type="number" id="year" name="year" min="1990" max="2025" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color" name="color" placeholder="e.g., White, Blue">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📏 Specifications</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="length">Length (m)</label>
+                        <input type="number" id="length" name="length" step="0.1" placeholder="e.g., 13.6">
+                    </div>
+                    <div class="form-group">
+                        <label for="width">Width (m)</label>
+                        <input type="number" id="width" name="width" step="0.1" placeholder="e.g., 2.55">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="height">Height (m)</label>
+                        <input type="number" id="height" name="height" step="0.1" placeholder="e.g., 4.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="axles">Number of Axles</label>
+                        <select id="axles" name="axles">
+                            <option value="">Select axles</option>
+                            <option value="1">1 Axle</option>
+                            <option value="2">2 Axles</option>
+                            <option value="3">3 Axles</option>
+                            <option value="4">4 Axles</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxWeight">Max Gross Weight (kg)</label>
+                        <input type="number" id="maxWeight" name="maxWeight" placeholder="e.g., 38000">
+                    </div>
+                    <div class="form-group">
+                        <label for="tareWeight">Tare Weight (kg)</label>
+                        <input type="number" id="tareWeight" name="tareWeight" placeholder="e.g., 7000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payloadCapacity">Payload Capacity (kg)</label>
+                    <input type="number" id="payloadCapacity" name="payloadCapacity" placeholder="e.g., 31000">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📋 Documentation</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="motExpiry">MOT Expiry Date</label>
+                        <input type="date" id="motExpiry" name="motExpiry">
+                    </div>
+                    <div class="form-group">
+                        <label for="insuranceExpiry">Insurance Expiry Date</label>
+                        <input type="date" id="insuranceExpiry" name="insuranceExpiry">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taxExpiry">Tax Expiry Date</label>
+                        <input type="date" id="taxExpiry" name="taxExpiry">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastInspection">Last Inspection Date</label>
+                        <input type="date" id="lastInspection" name="lastInspection">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔧 Features & Equipment</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="airSuspension" name="features" value="air-suspension">
+                        Air Suspension
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="liftAxle" name="features" value="lift-axle">
+                        Lift Axle
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="tailLift" name="features" value="tail-lift">
+                        Tail Lift
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sideOpening" name="features" value="side-opening">
+                        Side Opening
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 Additional Information</h3>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Any additional information about the trailer..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">🚚 Add Trailer to Fleet</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('addTrailerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const registration = formData.get('registration');
+            const trailerType = formData.get('trailerType');
+            
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = '<div class="success-message" style="display: block;">✅ Trailer successfully added to fleet! <a href="fleet_management.html">View Fleet Management</a></div>';
+            
+            // Log activity to dashboard
+            if (window.logActivity) {
+                window.logActivity('Trailer Added', `${registration} - ${trailerType} added to fleet`);
+            }
+            
+            // Clear form
+            this.reset();
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POD Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; color: #333; }
+        .header h1 { color: #fd7e14; margin-bottom: 10px; }
+        .nav-links { margin-bottom: 20px; text-align: center; }
+        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #fd7e14; text-decoration: none; border-radius: 5px; border: 1px solid #fd7e14; }
+        .nav-links a:hover { background: #fd7e14; color: white; }
+        .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
+        .section h3 { color: #fd7e14; margin-bottom: 15px; border-bottom: 2px solid #fd7e14; padding-bottom: 5px; }
+        .form-group { margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { border-color: #fd7e14; outline: none; }
+        .required { color: #dc3545; }
+        .file-upload { border: 2px dashed #fd7e14; padding: 20px; text-align: center; border-radius: 8px; margin: 10px 0; }
+        .file-upload:hover { background: #fff8f0; }
+        .uploaded-files { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        .file-item { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .submit-btn { background: #fd7e14; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 20px; }
+        .submit-btn:hover { background: #e8630a; }
+        .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #c3e6cb; display: none; }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="transport_form_local.html">🚛 Local Planning</a>
+        <a href="international_transport.html">🌍 International Planning</a>
+        <a href="fleet_management.html">👥 Fleet Management</a>
+        <a href="add_truck.html">➕ Add Truck</a>
+        <a href="add_trailer.html">🚚 Add Trailer</a>
+    </div>
+
+    <div class="form-container">
+        <div class="header">
+            <h1>📋 POD Upload</h1>
+            <p>Upload proof of delivery documents</p>
+        </div>
+
+        <div id="messageArea"></div>
+
+        <form id="podUploadForm">
+            <div class="section">
+                <h3>📋 Delivery Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="routeRef">Route Reference <span class="required">*</span></label>
+                        <input type="text" id="routeRef" name="routeRef" placeholder="e.g., RT-20250223-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryDate">Delivery Date <span class="required">*</span></label>
+                        <input type="date" id="deliveryDate" name="deliveryDate" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="driverName">Driver Name <span class="required">*</span></label>
+                        <select id="driverName" name="driverName" required>
+                            <option value="">Select driver</option>
+                            <option value="auris">auris</option>
+                            <option value="john_smith">John Smith</option>
+                            <option value="mary_oconnor">Mary O'Connor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleReg">Vehicle Registration</label>
+                        <input type="text" id="vehicleReg" name="vehicleReg" placeholder="e.g., 231LH1460">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📍 Delivery Details</h3>
+                <div class="form-group">
+                    <label for="deliveryAddress">Delivery Address <span class="required">*</span></label>
+                    <textarea id="deliveryAddress" name="deliveryAddress" rows="2" placeholder="Full delivery address..." required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customerName">Customer/Recipient Name</label>
+                        <input type="text" id="customerName" name="customerName" placeholder="Person who received delivery">
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryTime">Delivery Time</label>
+                        <input type="time" id="deliveryTime" name="deliveryTime">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryNotes">Delivery Notes</label>
+                    <textarea id="deliveryNotes" name="deliveryNotes" rows="3" placeholder="Any special notes about the delivery..."></textarea>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📁 Document Upload</h3>
+                <div class="form-group">
+                    <label>Upload POD Documents <span class="required">*</span></label>
+                    <div class="file-upload" onclick="document.getElementById('podFiles').click()">
+                        <p>📁 Click to upload or drag files here</p>
+                        <p style="color: #666; font-size: 0.9em;">Accepted formats: PDF, JPG, PNG (Max 10MB each)</p>
+                        <input type="file" id="podFiles" name="podFiles" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    <div id="uploadedFiles" class="uploaded-files" style="display: none;">
+                        <h4>Uploaded Files:</h4>
+                        <div id="fileList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>✅ Delivery Status</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="deliveryStatus">Delivery Status <span class="required">*</span></label>
+                        <select id="deliveryStatus" name="deliveryStatus" required>
+                            <option value="">Select status</option>
+                            <option value="delivered">Successfully Delivered</option>
+                            <option value="partial">Partially Delivered</option>
+                            <option value="failed">Delivery Failed</option>
+                            <option value="rescheduled">Rescheduled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signatureType">Signature Type</label>
+                        <select id="signatureType" name="signatureType">
+                            <option value="">Select signature type</option>
+                            <option value="wet_signature">Wet Signature</option>
+                            <option value="electronic">Electronic Signature</option>
+                            <option value="no_signature">No Signature Required</option>
+                            <option value="left_safe">Left in Safe Place</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">📋 Upload POD Documents</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('podFiles').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const fileList = document.getElementById('fileList');
+            const uploadedFiles = document.getElementById('uploadedFiles');
+            
+            if (files.length > 0) {
+                uploadedFiles.style.display = 'block';
+                fileList.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file-item';
+                    fileDiv.innerHTML = `
+                        <span>📄 ${files[i].name} (${(files[i].size / 1024).toFixed(1)} KB)</span>
+                        <button type="button" onclick="removeFile(${i})">Remove</button>
+                    `;
+                    fileList.appendChild(fileDiv);
+                }
+            }
+        });
+
+        function removeFile(index) {
+            // In a real app, this would remove the file from the input
+            console.log('Remove file at index:', index);
+        }
+
+        document.getElementById('podUploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const routeRef = formData.get('routeRef');
+            const driverName = formData.get('driverName');
+            
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = '<div class="success-message" style="display: block;">✅ POD documents successfully uploaded! <a href="index.html">Back to Dashboard</a></div>';
+            
+            // Log activity to dashboard
+            if (window.logActivity) {
+                window.logActivity('POD Uploaded', `${routeRef} - Documents uploaded by ${driverName}`);
+            }
+            
+            // Clear form
+            this.reset();
+            document.getElementById('uploadedFiles').style.display = 'none';
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+    </script>
+</body>
+</html> 

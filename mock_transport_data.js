@@ -1,7 +1,7 @@
 // Mock data that matches the current transport plan form exactly
 const mockTransportData = {
   // Route Information
-  routeDate: "2025-02-23",
+  routeDate: "2025-06-23",
   routeType: "mixed_route",
   startTime: "06:00",
   expectedEndTime: "18:00",
@@ -9,19 +9,19 @@ const mockTransportData = {
   // Vehicle & Driver Assignment
   driverName: "auris",
   driverPhone: "0838352129",
-  truckDetails: "231LH1460", // ✅ Exact database format
-  trailerDetails: "KT 798",   // ✅ Exact database format
+  truckDetails: "231LH1460 - Volvo - 370KGXP",
+  trailerDetails: "Articulated Truck - 300000KG - A3F2E",
   
   // Collection Points (5 stops)
   collectionAddress: [
-    "NB Warehouse, Citywest",
+    "NB Warehouse, Drogheda",
     "K&N Distribution Center, Swords", 
     "GXO Logistics, Swords",
     "Kepak Cork Processing Plant",
     "Kingsgate Portlaoise Distribution"
   ],
-  collectionTimeFrom: ["07:00", "08:30", "11:00", "13:00", "15:00"],
-  collectionTimeTo: ["07:30", "10:00", "12:00", "14:00", "16:00"],
+  collectionTimeFrom: ["07:00", "08:30", "10:30", "16:00", "18:00"],
+  collectionTimeTo: ["07:30", "10:00", "11:00", "16:30", "18:30"],
   collectionPriority: ["medium", "medium", "medium", "medium", "medium"],
   collectionContact: [
     "John Byrne - 087-1234567",
@@ -34,15 +34,15 @@ const mockTransportData = {
   collectionSpecialInstructions: [
     "Take empty trailer",
     "Collect empty crates for Kepak, Cork", 
-    "Live Tracking for Kepak Cork",
-    "Collect mixed golds",
-    "Collect mixed goods for final delivery"
+    "Collect crates for Kepak Cork",
+    "Collect pallets for Tesco",
+    "Collect pallets for Tesco"
   ],
   
   // Delivery Points (2 stops)
   deliveryAddress: [
     "Kepak Cork",
-    "NB Return Depot, Dispatch Bay"
+    "NB Return Depot Dispatch Bay"
   ],
   deliveryTimeFrom: ["14:00", "20:00"],
   deliveryTimeTo: ["15:00", "20:30"],
@@ -54,7 +54,7 @@ const mockTransportData = {
   deliveryDuration: [30, 20],
   deliverySpecialInstructions: [
     "UNLOAD CRATES",
-    "Drop trailer at dispatch bay, return unladen"
+    "Drop trailer at dispatch bay"
   ],
   
   // Additional Instructions

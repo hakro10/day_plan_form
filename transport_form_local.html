@@ -515,10 +515,10 @@
         // Update summary when route type changes
         document.getElementById('routeType').addEventListener('change', updateRouteSummary);
 
-        // MOCK DATA FUNCTION
+        // MOCK DATA FUNCTION - Updated to use external mock data
         function fillMockData() {
-            // Route Information
-            document.getElementById('routeDate').valueAsDate = new Date();
+            // Route Information from mock data
+            document.getElementById('routeDate').value = '2025-06-23';
             document.getElementById('routeType').value = 'mixed_route';
             document.getElementById('startTime').value = '06:00';
             document.getElementById('expectedEndTime').value = '18:00';
@@ -563,69 +563,69 @@
             collectionCount = 0;
             deliveryCount = 0;
 
-            // Mock Collection Points - Based on actual plan data
+            // Mock Collection Points - Updated with your exact data
             const mockCollections = [
                 {
-                    address: 'NB Warehouse, Industrial Estate, Dublin',
+                    address: 'NB Warehouse, Citywest',
                     timeFrom: '07:00',
                     timeTo: '07:30',
-                    contact: 'John Smith - 087-1234567',
+                    contact: 'John Byrne - 087-1234567',
                     duration: '30',
-                    notes: 'Take empty trailer from dock 3'
+                    notes: 'Take empty trailer'
                 },
                 {
-                    address: 'K&N Distribution Center, Cork Road',
+                    address: 'K&N Distribution Center, Portlaoise',
                     timeFrom: '08:30',
                     timeTo: '10:00',
                     contact: 'Mary O\'Connor - 086-9876543',
-                    duration: '90',
-                    notes: 'Collect frozen goods; temperature -18°C'
+                    duration: '60',
+                    notes: 'Collect empty crates for Kepak, Cork'
                 },
                 {
-                    address: 'GXO Logistics, Portlaoise',
+                    address: 'GXO Logistics, Naas',
                     timeFrom: '11:00',
                     timeTo: '12:00',
                     contact: 'Pat Murphy - 085-5555555',
-                    duration: '60',
-                    notes: 'Load Trucking for kepak cork'
+                    duration: '45',
+                    notes: 'Live Tracking for Kepak Cork'
                 },
                 {
                     address: 'Kepak Cork Processing Plant',
                     timeFrom: '13:00',
                     timeTo: '14:00',
-                    contact: 'Sean Kelly - 087-7777777',
-                    duration: '60',
-                    notes: 'Collect meat products, chilled transport for kepak'
+                    contact: 'Tom Kelly - 087-7777777',
+                    duration: '30',
+                    notes: 'Collect mixed golds'
                 },
                 {
                     address: 'Kingsgate Portlaoise Distribution',
                     timeFrom: '15:00',
                     timeTo: '16:00',
-                    contact: 'Lisa Ryan - 086-3333333',
-                    duration: '60',
-                    notes: 'Collect tesco goods for final delivery'
+                    contact: 'Joe Ryan - 086-3333333',
+                    duration: '45',
+                    notes: 'Collect mixed goods for final delivery'
                 }
             ];
 
-            // Mock Delivery Points - Based on actual plan data
+            // Mock Delivery Points - Updated with your exact data
             const mockDeliveries = [
                 {
-                    address: 'Kepak Cork Retail Store',
+                    address: 'Kepak Cork',
                     timeFrom: '14:00',
                     timeTo: '15:00',
-                    contact: 'Mike O\'Brien - 087-8888888',
-                    duration: '20',
+                    contact: 'Mike O\'Brien - 021-4444444',
+                    duration: '30',
                     priority: 'high',
-                    notes: 'Unload creates'
+                    notes: 'UNLOAD 6 CRATES'
                 },
                 {
                     address: 'NB Return Depot, Dispatch Bay',
                     timeFrom: '20:00',
                     timeTo: '20:30',
                     contact: 'Night Supervisor - 087-9999999',
-                    duration: '30',
+                    duration: '20',
                     priority: 'medium',
-                    notes: 'Drop trailer at dispatch bay, return vehicle'
+                    notes: 'Drop trailer at dispatch bay, return unladen'
                 }
             ];
 
@@ -806,6 +806,12 @@
 
                 if (response.ok) {
                     showMessage('✅ Local transport plan created successfully! Driver will receive detailed route via Telegram.', 'success');
+                    
+                    // Log activity to dashboard
+                    if (window.logActivity) {
+                        window.logActivity('Local Route Created', `${data.routeType} for ${data.driverName} - ${data.truckDetails}`);
+                    }
+                    
                     e.target.reset();
                     document.getElementById('routeDate').valueAsDate = new Date();
                     document.getElementById('routeSummary').style.display = 'none';

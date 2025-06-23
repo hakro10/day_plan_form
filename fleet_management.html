@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; color: #333; }
+        .header h1 { color: #17a2b8; margin-bottom: 10px; }
+        .nav-links { margin-bottom: 20px; text-align: center; }
+        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #17a2b8; text-decoration: none; border-radius: 5px; border: 1px solid #17a2b8; }
+        .nav-links a:hover { background: #17a2b8; color: white; }
+        .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
+        .section h3 { color: #17a2b8; margin-bottom: 15px; border-bottom: 2px solid #17a2b8; padding-bottom: 5px; }
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .fleet-item { background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .fleet-item h4 { color: #17a2b8; margin-bottom: 10px; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .available { background: #28a745; color: white; }
+        .busy { background: #dc3545; color: white; }
+        .maintenance { background: #ffc107; color: black; }
+        .filter-bar { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .filter-bar select, .filter-bar input { margin: 0 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .add-btn { background: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .add-btn:hover { background: #138496; }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="transport_form_local.html">🚛 Local Planning</a>
+        <a href="international_transport.html">🌍 International Planning</a>
+        <a href="add_truck.html">➕ Add Truck</a>
+        <a href="add_trailer.html">🚚 Add Trailer</a>
+        <a href="pod_upload.html">📋 POD Upload</a>
+    </div>
+
+    <div class="form-container">
+        <div class="header">
+            <h1>👥 Fleet Management</h1>
+            <p>Manage drivers, trucks, and trailers availability</p>
+        </div>
+
+        <div class="filter-bar">
+            <select>
+                <option>All Vehicles</option>
+                <option>Trucks Only</option>
+                <option>Trailers Only</option>
+            </select>
+            <select>
+                <option>All Status</option>
+                <option>Available</option>
+                <option>Busy</option>
+                <option>Maintenance</option>
+            </select>
+            <input type="text" placeholder="Search by registration...">
+            <a href="add_truck.html" class="add-btn">➕ Add Truck</a>
+            <a href="add_trailer.html" class="add-btn">🚚 Add Trailer</a>
+        </div>
+
+        <div class="section">
+            <h3>🚛 Trucks</h3>
+            <div class="fleet-grid">
+                <div class="fleet-item">
+                    <h4>231LH1460</h4>
+                    <p><strong>Driver:</strong> auris</p>
+                    <p><strong>Type:</strong> Articulated Truck</p>
+                    <p><strong>Status:</strong> <span class="status busy">On Route</span></p>
+                    <p><strong>Location:</strong> En route to Kepak Cork</p>
+                    <p><strong>Next Service:</strong> 15,000 km</p>
+                </div>
+                
+                <div class="fleet-item">
+                    <h4>151D4521</h4>
+                    <p><strong>Driver:</strong> Unassigned</p>
+                    <p><strong>Type:</strong> Rigid Truck</p>
+                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
+                    <p><strong>Location:</strong> Depot</p>
+                    <p><strong>Next Service:</strong> 8,500 km</p>
+                </div>
+                
+                <div class="fleet-item">
+                    <h4>182MN3467</h4>
+                    <p><strong>Driver:</strong> John Smith</p>
+                    <p><strong>Type:</strong> Van</p>
+                    <p><strong>Status:</strong> <span class="status maintenance">Maintenance</span></p>
+                    <p><strong>Location:</strong> Workshop</p>
+                    <p><strong>Issue:</strong> Brake service</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🚚 Trailers</h3>
+            <div class="fleet-grid">
+                <div class="fleet-item">
+                    <h4>KT 798</h4>
+                    <p><strong>Attached to:</strong> 231LH1460</p>
+                    <p><strong>Type:</strong> Semi-trailer</p>
+                    <p><strong>Status:</strong> <span class="status busy">In Use</span></p>
+                    <p><strong>Load:</strong> Mixed goods</p>
+                    <p><strong>Capacity:</strong> 38 tonnes</p>
+                </div>
+                
+                <div class="fleet-item">
+                    <h4>WX 445</h4>
+                    <p><strong>Attached to:</strong> None</p>
+                    <p><strong>Type:</strong> Box trailer</p>
+                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
+                    <p><strong>Location:</strong> Depot yard</p>
+                    <p><strong>Capacity:</strong> 24 tonnes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>👤 Drivers</h3>
+            <div class="fleet-grid">
+                <div class="fleet-item">
+                    <h4>auris</h4>
+                    <p><strong>Phone:</strong> 0838352129</p>
+                    <p><strong>Vehicle:</strong> 231LH1460</p>
+                    <p><strong>Status:</strong> <span class="status busy">On Route</span></p>
+                    <p><strong>License:</strong> Class C+E</p>
+                    <p><strong>Hours Today:</strong> 6/13</p>
+                </div>
+                
+                <div class="fleet-item">
+                    <h4>John Smith</h4>
+                    <p><strong>Phone:</strong> 087-1234567</p>
+                    <p><strong>Vehicle:</strong> None</p>
+                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
+                    <p><strong>License:</strong> Class C</p>
+                    <p><strong>Hours Today:</strong> 0/13</p>
+                </div>
+                
+                <div class="fleet-item">
+                    <h4>Mary O'Connor</h4>
+                    <p><strong>Phone:</strong> 086-9876543</p>
+                    <p><strong>Vehicle:</strong> None</p>
+                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
+                    <p><strong>License:</strong> Class C+E</p>
+                    <p><strong>Hours Today:</strong> 2/13</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

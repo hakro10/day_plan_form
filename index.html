@@ -99,23 +99,110 @@
 
         <div class="recent-activity">
             <h3>📊 Recent Activity</h3>
-            <div class="activity-item">
-                <strong>Local Route Created</strong> - Mixed Collection & Delivery for auris
-                <div class="activity-time">2 hours ago</div>
-            </div>
-            <div class="activity-item">
-                <strong>International Route</strong> - Germany to Ireland scheduled
-                <div class="activity-time">4 hours ago</div>
-            </div>
-            <div class="activity-item">
-                <strong>Truck 231LH1460</strong> - Maintenance completed
-                <div class="activity-time">1 day ago</div>
-            </div>
-            <div class="activity-item">
-                <strong>Driver Added</strong> - New driver registered to system
-                <div class="activity-time">2 days ago</div>
+            <div id="activityList">
+                <!-- Dynamic activity will be loaded here -->
             </div>
         </div>
     </div>
+
+    <script>
+        // Load recent activity dynamically
+        function loadRecentActivity() {
+            const activityList = document.getElementById('activityList');
+            
+            // Get recent activities from localStorage or use default
+            let activities = JSON.parse(localStorage.getItem('recentActivities')) || [
+                {
+                    type: 'Local Route Created',
+                    description: 'Mixed Collection & Delivery for auris',
+                    time: '2 hours ago'
+                },
+                {
+                    type: 'International Route',
+                    description: 'Germany to Ireland scheduled',
+                    time: '4 hours ago'
+                },
+                {
+                    type: 'Truck 231LH1460',
+                    description: 'Maintenance completed',
+                    time: '1 day ago'
+                },
+                {
+                    type: 'Driver Added',
+                    description: 'New driver registered to system',
+                    time: '2 days ago'
+                }
+            ];
+
+            // Display activities
+            activityList.innerHTML = '';
+            activities.slice(0, 10).forEach(activity => {
+                const activityDiv = document.createElement('div');
+                activityDiv.className = 'activity-item';
+                activityDiv.innerHTML = `
+                    <strong>${activity.type}</strong> - ${activity.description}
+                    <div class="activity-time">${activity.time}</div>
+                `;
+                activityList.appendChild(activityDiv);
+            });
+        }
+
+        // Add new activity (call this from other pages)
+        function addActivity(type, description) {
+            let activities = JSON.parse(localStorage.getItem('recentActivities')) || [];
+            
+            activities.unshift({
+                type: type,
+                description: description,
+                time: 'Just now',
+                timestamp: new Date().toISOString()
+            });
+
+            // Keep only last 20 activities
+            activities = activities.slice(0, 20);
+            
+            localStorage.setItem('recentActivities', JSON.stringify(activities));
+        }
+
+        // Update time stamps
+        function updateActivityTimes() {
+            let activities = JSON.parse(localStorage.getItem('recentActivities')) || [];
+            
+            activities.forEach(activity => {
+                if (activity.timestamp) {
+                    const now = new Date();
+                    const activityTime = new Date(activity.timestamp);
+                    const diffMinutes = Math.floor((now - activityTime) / (1000 * 60));
+                    
+                    if (diffMinutes < 1) {
+                        activity.time = 'Just now';
+                    } else if (diffMinutes < 60) {
+                        activity.time = `${diffMinutes} minutes ago`;
+                    } else if (diffMinutes < 1440) {
+                        const hours = Math.floor(diffMinutes / 60);
+                        activity.time = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                    } else {
+                        const days = Math.floor(diffMinutes / 1440);
+                        activity.time = `${days} day${days > 1 ? 's' : ''} ago`;
+                    }
+                }
+            });
+            
+            localStorage.setItem('recentActivities', JSON.stringify(activities));
+            loadRecentActivity();
+        }
+
+        // Load activity on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecentActivity();
+            updateActivityTimes();
+            
+            // Update activity times every minute
+            setInterval(updateActivityTimes, 60000);
+        });
+
+        // Global function to add activities from other pages
+        window.logActivity = addActivity;
+    </script>
 </body>
 </html> 
