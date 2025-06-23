@@ -238,7 +238,11 @@
                 <div id="summaryContent"></div>
             </div>
 
-            <button type="submit" style="width: 100%; margin-top: 20px;">📋 Create Local Transport Plan</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="fillMockData()" style="background: #28a745; color: white; width: 150px;">🎯 Mock Data</button>
+                <button type="button" onclick="clearForm()" style="background: #dc3545; color: white; width: 120px;">🗑️ Clear</button>
+                <button type="submit" style="flex: 1;">📋 Create Local Transport Plan</button>
+            </div>
         </form>
 
         <div class="nav-links">
@@ -510,6 +514,176 @@
 
         // Update summary when route type changes
         document.getElementById('routeType').addEventListener('change', updateRouteSummary);
+
+        // MOCK DATA FUNCTION
+        function fillMockData() {
+            // Route Information
+            document.getElementById('routeDate').valueAsDate = new Date();
+            document.getElementById('routeType').value = 'mixed_route';
+            document.getElementById('startTime').value = '06:00';
+            document.getElementById('expectedEndTime').value = '18:00';
+
+            // Wait for data to load, then select vehicles and driver
+            setTimeout(() => {
+                // Select first available truck if exists
+                const truckSelect = document.getElementById('truckSelect');
+                if (truckSelect.options.length > 1) {
+                    truckSelect.selectedIndex = 1;
+                    truckSelect.dispatchEvent(new Event('change'));
+                }
+
+                // Select first available trailer if exists
+                const trailerSelect = document.getElementById('trailerSelect');
+                if (trailerSelect.options.length > 1) {
+                    trailerSelect.selectedIndex = 1;
+                    trailerSelect.dispatchEvent(new Event('change'));
+                }
+
+                // Select first available driver if exists
+                const driverSelect = document.getElementById('driverName');
+                if (driverSelect.options.length > 1) {
+                    driverSelect.selectedIndex = 1;
+                    driverSelect.dispatchEvent(new Event('change'));
+                }
+            }, 500);
+
+            // Clear existing collection/delivery points
+            document.getElementById('collectionPoints').innerHTML = '';
+            document.getElementById('deliveryPoints').innerHTML = '';
+            collectionCount = 0;
+            deliveryCount = 0;
+
+            // Mock Collection Points
+            const mockCollections = [
+                {
+                    address: 'NB Warehouse, Industrial Estate, Dublin',
+                    timeFrom: '07:00',
+                    timeTo: '07:30',
+                    contact: 'John Smith - 087-1234567',
+                    duration: '30',
+                    notes: 'Take empty trailer from dock 3'
+                },
+                {
+                    address: 'K&N Distribution Center, Cork Road',
+                    timeFrom: '08:30',
+                    timeTo: '10:00',
+                    contact: 'Mary O\'Connor - 086-9876543',
+                    duration: '90',
+                    notes: 'Collect frozen goods, temperature -18°C'
+                },
+                {
+                    address: 'GXO Logistics, Portlaoise',
+                    timeFrom: '11:00',
+                    timeTo: '12:00',
+                    contact: 'Pat Murphy - 085-5555555',
+                    duration: '60',
+                    notes: 'Load palletized goods, dock 7'
+                },
+                {
+                    address: 'Kepak Cork Processing Plant',
+                    timeFrom: '13:00',
+                    timeTo: '14:00',
+                    contact: 'Sean Kelly - 087-7777777',
+                    duration: '60',
+                    notes: 'Collect meat products, chilled transport'
+                },
+                {
+                    address: 'Kingsgate Portlaoise Distribution',
+                    timeFrom: '15:00',
+                    timeTo: '16:00',
+                    contact: 'Lisa Ryan - 086-3333333',
+                    duration: '60',
+                    notes: 'Collect retail goods for final delivery'
+                }
+            ];
+
+            // Mock Delivery Points
+            const mockDeliveries = [
+                {
+                    address: 'Kepak Cork Retail Store',
+                    timeFrom: '14:00',
+                    timeTo: '15:00',
+                    contact: 'Mike O\'Brien - 087-8888888',
+                    duration: '60',
+                    priority: 'high',
+                    notes: 'Unload fresh creates, priority delivery'
+                },
+                {
+                    address: 'NB Return Depot, Dispatch Bay',
+                    timeFrom: '20:00',
+                    timeTo: '20:30',
+                    contact: 'Night Supervisor - 087-9999999',
+                    duration: '30',
+                    priority: 'medium',
+                    notes: 'Drop trailer at dispatch bay, return vehicle'
+                }
+            ];
+
+            // Add mock collection points
+            mockCollections.forEach((collection, index) => {
+                addCollectionPoint();
+                const points = document.querySelectorAll('#collectionPoints .point-group');
+                const currentPoint = points[points.length - 1];
+                
+                currentPoint.querySelector('input[name="collectionAddress[]"]').value = collection.address;
+                currentPoint.querySelector('input[name="collectionTimeFrom[]"]').value = collection.timeFrom;
+                currentPoint.querySelector('input[name="collectionTimeTo[]"]').value = collection.timeTo;
+                currentPoint.querySelector('input[name="collectionContact[]"]').value = collection.contact;
+                currentPoint.querySelector('input[name="collectionDuration[]"]').value = collection.duration;
+                currentPoint.querySelector('textarea[name="collectionNotes[]"]').value = collection.notes;
+            });
+
+            // Add mock delivery points
+            mockDeliveries.forEach((delivery, index) => {
+                addDeliveryPoint();
+                const points = document.querySelectorAll('#deliveryPoints .point-group');
+                const currentPoint = points[points.length - 1];
+                
+                currentPoint.querySelector('input[name="deliveryAddress[]"]').value = delivery.address;
+                currentPoint.querySelector('input[name="deliveryTimeFrom[]"]').value = delivery.timeFrom;
+                currentPoint.querySelector('input[name="deliveryTimeTo[]"]').value = delivery.timeTo;
+                currentPoint.querySelector('select[name="deliveryPriority[]"]').value = delivery.priority;
+                currentPoint.querySelector('input[name="deliveryContact[]"]').value = delivery.contact;
+                currentPoint.querySelector('input[name="deliveryDuration[]"]').value = delivery.duration;
+                currentPoint.querySelector('textarea[name="deliveryNotes[]"]').value = delivery.notes;
+            });
+
+            // Additional Instructions
+            document.getElementById('routeInstructions').value = 'Avoid N7 construction zone. Use M50 route. Mandatory 45min break after Portlaoise collection.';
+            document.getElementById('fuelStops').value = 'if_needed';
+            document.getElementById('returnToDepot').value = 'same_day';
+
+            // Update route summary
+            updateRouteSummary();
+
+            // Show success message
+            showMessage('🎯 Mock data filled successfully! Ready for testing.', 'success');
+        }
+
+        // CLEAR FORM FUNCTION
+        function clearForm() {
+            // Reset the entire form
+            document.getElementById('localTransportForm').reset();
+            
+            // Clear dynamic content
+            document.getElementById('collectionPoints').innerHTML = '';
+            document.getElementById('deliveryPoints').innerHTML = '';
+            collectionCount = 0;
+            deliveryCount = 0;
+            
+            // Reset counters and summary
+            updateRouteSummary();
+            
+            // Set today's date
+            document.getElementById('routeDate').valueAsDate = new Date();
+            
+            // Clear detail fields
+            document.getElementById('driverPhone').value = '';
+            document.getElementById('truckDetails').value = '';
+            document.getElementById('trailerDetails').value = '';
+            
+            showMessage('🗑️ Form cleared successfully!', 'success');
+        }
 
         // IMPROVED: Form validation
         function validateLocalForm() {
