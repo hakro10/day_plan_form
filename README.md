@@ -59,6 +59,7 @@ driver_day_planing/
 ├── pod_upload.html                # Proof of delivery upload
 ├── main_code_final.js             # Telegram bot commands
 ├── registration_code_fixed.js     # Driver registration logic
+├── mock_transport_data.js         # Test data for development
 └── sample.txt                     # Project requirements
 ```
 
@@ -225,10 +226,11 @@ Track system usage through:
 - **v2.0** - Added local vs international separation
 - **v2.1** - Enhanced fleet management
 - **v2.2** - POD upload system
-- **Current** - Complete dashboard integration
+- **v2.3** - Added mock transport data for testing
+- **Current** - Complete dashboard integration with special instructions per stop
 
 ---
 
 **🚛 Ready for Production Deployment!**
 
-The system is fully functional and ready for your planning team to use. Both local and international transport planning workflows are operational and integrated with your existing fleet management database. 
+The system is fully functional and ready for your planning team to use. Both local and international transport planning workflows are operational and integrated with your existing fleet management database.

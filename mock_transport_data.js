@@ -9,8 +9,8 @@ const mockTransportData = {
   // Vehicle & Driver Assignment
   driverName: "auris",
   driverPhone: "0838352129",
-  truckDetails: "231lh1460",
-  trailerDetails: "kt798",
+  truckDetails: "231LH1460", // ✅ Exact database format
+  trailerDetails: "KT 798",   // ✅ Exact database format
   
   // Collection Points (5 stops)
   collectionAddress: [

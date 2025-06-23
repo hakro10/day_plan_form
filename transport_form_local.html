@@ -775,13 +775,13 @@
             const selectedTruck = trucksData.find(truck => truck.id == selectedTruckId);
             if (selectedTruck) {
                 data.truckNumber = `${selectedTruck.truck_number} - ${selectedTruck.make} ${selectedTruck.model}`;
-                data.truckDetails = `${selectedTruck.make} ${selectedTruck.model} (${selectedTruck.year || 'N/A'})`;
+                data.truckDetails = selectedTruck.truck_number; // ✅ Just the truck number
             }
 
             const selectedTrailer = trailersData.find(trailer => trailer.id == selectedTrailerId);
             if (selectedTrailer) {
                 data.trailerNumber = `${selectedTrailer.trailer_number} - ${selectedTrailer.type}`;
-                data.trailerDetails = `${selectedTrailer.type} ${selectedTrailer.make || ''} ${selectedTrailer.model || ''}`;
+                data.trailerDetails = selectedTrailer.trailer_number; // ✅ Just the trailer number
             }
 
             const selectedDriver = driversData.find(driver => driver.id == selectedDriverId);
