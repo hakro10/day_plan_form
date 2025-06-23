@@ -1,238 +1,236 @@
-# 🎓 Learning Projects - Programming Fundamentals
+# 🚛 Transport Planning System
 
-A comprehensive learning platform featuring structured courses in Python and SQL, designed for beginners and intermediate learners.
+A comprehensive fleet management and route planning system designed for transport companies to manage both local and international logistics operations.
 
-## 📚 Available Courses
+## 📋 System Overview
 
-### 🐍 Python Fundamentals (10 Days)
-**Location**: `Python_fundamentals/`
+This system provides two distinct planning workflows:
+- **Local Transport Planning**: Same-day routes with precise time windows
+- **International Transport Planning**: Multi-day cross-border journeys with customs and compliance management
 
-A complete Python programming course covering everything from basic syntax to object-oriented programming.
+## 🌟 Features
 
-**Topics Covered**:
-- Variables, data types, and I/O operations
-- Operators, conditionals, and loops  
-- Data structures (lists, tuples, dictionaries, sets)
-- Functions and scope
-- File handling and error management
-- Modules and packages
-- Object-oriented programming
+### Local Transport Planning
+- ✅ Hourly time window scheduling
+- ✅ Multiple collection/delivery points per route
+- ✅ Priority-based stop ordering
+- ✅ Same-day return to depot options
+- ✅ Real-time driver notifications via Telegram
+- ✅ Route optimization with duration estimates
 
-**Start Here**: `Python_fundamentals/README.md`
+### International Transport Planning
+- 🌍 Multi-country routing with border crossings
+- 📋 Customs documentation tracking
+- 🛏️ EU driver rest period compliance (13h max driving, 8h rest)
+- 👥 Team driver coordination for long hauls
+- 🔔 Border crossing and progress notifications
+- 📅 Multi-day journey scheduling
 
-### 🗄️ SQL School (25 Days)
-**Location**: `SQL_school/`
+### Fleet Management
+- 🚛 Truck registration and management
+- 🚚 Trailer registration with specifications
+- 👥 Driver management with contact details
+- 📱 Telegram integration for notifications
+- 📋 Proof of Delivery (POD) upload system
 
-An extensive SQL course with hands-on PostgreSQL database exercises, from basic queries to advanced database administration.
+## 🚀 Quick Start
 
-**Topics Covered**:
-- SQL fundamentals and query operations
-- Joins, subqueries, and advanced analytics
-- Window functions and CTEs
-- Stored procedures, triggers, and functions
-- Performance optimization and indexing
-- Security and user management
-- ETL processes and data import/export
+### For Planners
+1. **Access the Dashboard**: Open `index.html` to see all available options
+2. **Local Planning**: Use for same-day deliveries within your region
+3. **International Planning**: Use for cross-border multi-day journeys
+4. **Fleet Management**: Manage drivers, trucks, and trailers
 
-**Start Here**: `SQL_school/README.md`
+### For Drivers
+- Receive route plans via Telegram
+- Upload POD documents with photos
+- Real-time communication with dispatch
 
-## 🚀 Quick Start Guide
-
-### Choose Your Learning Path
-
-#### Option 1: Python First (Recommended for Complete Beginners)
-```bash
-cd Python_fundamentals
-python --version  # Ensure Python 3.7+ is installed
-python Day01/exercises.py
-```
-
-#### Option 2: SQL First (For Data-Focused Learning)
-```bash
-cd SQL_school
-docker-compose up -d  # Start PostgreSQL database
-python check_connection.py
-```
-
-#### Option 3: Parallel Learning (For Experienced Programmers)
-Study both courses simultaneously, alternating days or focusing on specific topics.
-
-## 📂 Project Structure
+## 📁 File Structure
 
 ```
-Learning_projects/
-├── Python_fundamentals/          # 10-day Python course
-│   ├── Day01-Day10/             # Daily lessons
-│   ├── exercise_checker.py      # Automated validation
-│   └── README.md                # Python course guide
-├── SQL_school/                  # 25-day SQL course  
-│   ├── Day01-Day25/             # Daily lessons
-│   ├── docker-compose.yml       # Database setup
-│   ├── setup_database.py        # Database initialization
-│   └── README.md                # SQL course guide
-├── README.md                    # This file
-└── requirements.txt             # Python dependencies
+driver_day_planing/
+├── index.html                      # Main dashboard
+├── transport_form_local.html       # Local transport planning
+├── international_transport.html    # International transport planning
+├── fleet_management.html           # Driver management system
+├── add_truck.html                  # Truck registration
+├── add_trailer.html               # Trailer registration
+├── pod_upload.html                # Proof of delivery upload
+├── main_code_final.js             # Telegram bot commands
+├── registration_code_fixed.js     # Driver registration logic
+├── mock_transport_data.js         # Test data for development
+└── sample.txt                     # Project requirements
 ```
 
-## 🎯 Learning Objectives
+## 🔧 Technical Requirements
 
-### After Completing Python Fundamentals:
-- ✅ Write clean, readable Python code
-- ✅ Work with data structures and files
-- ✅ Implement object-oriented programming
-- ✅ Handle errors and exceptions
-- ✅ Create modular, reusable code
+### Backend Services
+- **Database**: Supabase (PostgreSQL)
+- **Automation**: n8n workflows
+- **Notifications**: Telegram Bot API
 
-### After Completing SQL School:
-- ✅ Design and query relational databases
-- ✅ Optimize database performance
-- ✅ Implement security and access controls
-- ✅ Build ETL pipelines
-- ✅ Manage enterprise database systems
+### Database Tables
+- `drivers` - Driver information and contact details
+- `trucks` - Fleet vehicle specifications
+- `trailers` - Trailer specifications and capacities
+- `transport_plans` - Route planning data
 
-### After Completing Both Courses:
-- ✅ Full-stack data processing capabilities
-- ✅ Backend development skills
-- ✅ Database application development
-- ✅ Data analysis and reporting
-- ✅ Automated data pipeline creation
+### API Endpoints
+- Local planning: `https://hakro.app.n8n.cloud/webhook/local-transport-plan`
+- International planning: `https://hakro.app.n8n.cloud/webhook/international-transport-plan`
+- POD upload: `http://localhost:5678/webhook/pod-upload`
 
-## 🛠️ Prerequisites
+## 🛠️ Setup Instructions
 
-### For Python Course:
-- **Python 3.7+** installed
-- Text editor or IDE
-- Basic computer literacy
+### 1. Database Setup (Supabase)
+```sql
+-- Create drivers table
+CREATE TABLE drivers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(255),
+    telegram_username VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    registered_by VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW()
+);
 
-### For SQL Course:
-- **Docker and Docker Compose** installed
-- **Python 3.7+** (for utilities)
-- Basic understanding of data concepts
+-- Create trucks table
+CREATE TABLE trucks (
+    id SERIAL PRIMARY KEY,
+    truck_number VARCHAR(50) UNIQUE NOT NULL,
+    make VARCHAR(100) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    year INTEGER,
+    license_plate VARCHAR(50),
+    vin VARCHAR(17),
+    capacity_kg INTEGER,
+    fuel_type VARCHAR(50) DEFAULT 'diesel',
+    notes TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 
-### System Requirements:
-- **OS**: Windows 10+, macOS 10.14+, or Linux
-- **RAM**: 4GB minimum, 8GB recommended
-- **Storage**: 2GB free space
-- **Network**: Internet connection for setup
-
-## 🎓 Recommended Learning Paths
-
-### Path 1: Complete Beginner
-1. **Week 1-2**: Python Fundamentals (Days 1-10)
-2. **Week 3-8**: SQL School (Days 1-25)
-3. **Week 9**: Integration projects combining both skills
-
-### Path 2: Data-Focused Learning
-1. **Week 1**: Python basics (Days 1-4)
-2. **Week 2-6**: SQL School (Days 1-25)
-3. **Week 7**: Advanced Python (Days 5-10)
-4. **Week 8**: Data projects using both technologies
-
-### Path 3: Accelerated Track
-1. **Python**: 1 lesson per day (10 days)
-2. **SQL**: 1 lesson per day (25 days)
-3. **Integration**: 5 days of combined projects
-4. **Total**: 40-day intensive program
-
-## 📊 Progress Tracking
-
-### Python Progress
-```bash
-cd Python_fundamentals
-python exercise_checker.py --progress
+-- Create trailers table
+CREATE TABLE trailers (
+    id SERIAL PRIMARY KEY,
+    trailer_number VARCHAR(50) UNIQUE NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    make VARCHAR(100),
+    model VARCHAR(100),
+    year INTEGER,
+    license_plate VARCHAR(50),
+    vin VARCHAR(17),
+    capacity_kg INTEGER,
+    length_m DECIMAL(5,2),
+    width_m DECIMAL(5,2),
+    height_m DECIMAL(5,2),
+    notes TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
-### SQL Progress
-```bash
-cd SQL_school
-python quick_progress.py
+### 2. Environment Configuration
+Update the Supabase connection details in all HTML files:
+```javascript
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 ```
 
-## 🤝 Getting Help
+### 3. Telegram Bot Setup
+1. Create a bot via @BotFather
+2. Configure webhook URLs in n8n
+3. Update bot commands in `main_code_final.js`
 
-### Course-Specific Help:
-- **Python**: Check `Python_fundamentals/README.md`
-- **SQL**: Check `SQL_school/README.md`
+### 4. n8n Workflow Configuration
+Set up workflows for:
+- Local transport plan processing
+- International transport plan processing
+- Telegram message handling
+- POD document processing
 
-### General Troubleshooting:
-1. **Setup Issues**: Verify prerequisites are installed
-2. **Exercise Problems**: Use built-in checkers and validators
-3. **Concept Confusion**: Review theory files in each day's folder
+## 📱 Telegram Bot Commands
 
-## 🌟 What's Next?
+### Admin Commands
+- `/adddriver [Name] [Phone] [Email]` - Register new driver
+- `/listdrivers` - Show all registered drivers
+- `/driverstatus [Phone]` - Check driver status
+- `/removedriver [Phone]` - Remove driver from system
 
-After completing these fundamentals courses, consider exploring:
+### Driver Commands
+- Receive automated route plans
+- Update delivery status
+- Upload POD photos
 
-### Advanced Python Topics:
-- **Web Development**: Django, Flask, FastAPI
-- **Data Science**: NumPy, Pandas, Matplotlib, Jupyter
-- **Machine Learning**: Scikit-learn, TensorFlow, PyTorch
-- **Automation**: Selenium, Beautiful Soup, APIs
+## 🌍 International Transport Compliance
 
-### Advanced SQL and Database Topics:
-- **NoSQL Databases**: MongoDB, Redis, Elasticsearch
-- **Data Warehousing**: Snowflake, BigQuery, Redshift
-- **Real-time Processing**: Apache Kafka, Stream Processing
-- **Cloud Databases**: AWS RDS, Azure SQL, Google Cloud SQL
+### EU Regulations Supported
+- **Driving Time Limits**: Maximum 13 hours per day
+- **Rest Periods**: Minimum 8 hours between shifts
+- **Border Documentation**: Customs clearance tracking
+- **Route Planning**: Multi-country journey optimization
 
-### Integration Projects:
-- **Web Applications**: Python backend with SQL database
-- **Data Pipelines**: ETL processes using Python and SQL
-- **Analytics Dashboards**: Data visualization with Python and SQL
-- **APIs**: RESTful services connecting to databases
+### Documentation Requirements
+- Commercial invoices
+- CMR notes (road consignment)
+- Export/import licenses
+- TiR Carnet for sealed loads
+- Customs declarations
 
-## 📈 Success Metrics
+## 🚨 Important Notes
 
-Track your learning progress:
+### Security
+- All API keys should be secured in production
+- Database access should be restricted
+- Webhook endpoints should be protected
 
-- **Python**: Complete all 10 days with passing exercise scores
-- **SQL**: Complete all 25 days with functional database projects
-- **Integration**: Build at least one project combining both skills
-- **Community**: Share your projects and help other learners
+### Performance
+- System handles multiple concurrent users
+- Database queries are optimized for fleet size
+- Real-time updates via Telegram
+
+### Limitations
+- International planning requires manual route optimization
+- Border crossing times are estimates
+- Telegram notifications require internet connectivity
+
+## 📞 Support & Maintenance
+
+### For Technical Issues
+1. Check database connection status
+2. Verify webhook endpoint accessibility
+3. Test Telegram bot functionality
+4. Review browser console for JavaScript errors
+
+### For Feature Requests
+This system is designed to be modular and extensible. Additional features can be added:
+- GPS tracking integration
+- Advanced route optimization
+- Customer portal access
+- Mobile app development
+
+## 📊 Usage Analytics
+
+Track system usage through:
+- Database record counts
+- Webhook call logs
+- Telegram message statistics
+- User feedback collection
+
+## 🔄 Version History
+
+- **v1.0** - Basic transport planning
+- **v2.0** - Added local vs international separation
+- **v2.1** - Enhanced fleet management
+- **v2.2** - POD upload system
+- **v2.3** - Added mock transport data for testing
+- **Current** - Complete dashboard integration with special instructions per stop
 
 ---
 
-## 🔧 Technical Setup
+**🚛 Ready for Production Deployment!**
 
-### Initial Environment Setup:
-```bash
-# Clone or download the learning projects
-# Navigate to the project directory
-cd Learning_projects
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Choose your starting course
-cd Python_fundamentals  # OR cd SQL_school
-```
-
-### Troubleshooting Common Issues:
-
-#### Python Not Found:
-```bash
-# Try these alternatives:
-python3 --version
-py --version
-```
-
-#### Docker Issues:
-```bash
-# Restart Docker service
-# Check Docker installation
-docker --version
-docker-compose --version
-```
-
-## 📝 Course Credits
-
-These courses were designed as comprehensive, hands-on learning experiences that emphasize:
-
-- **Practical Application**: Real-world projects and exercises
-- **Progressive Learning**: Building complexity gradually
-- **Best Practices**: Industry-standard coding and database practices
-- **Automated Feedback**: Built-in validation and progress tracking
-
-**Happy Learning! 🚀**
-
-*Remember: The best way to learn programming is by doing. Work through each exercise, experiment with the code, and build your own projects along the way!* 
+The system is fully functional and ready for your planning team to use. Both local and international transport planning workflows are operational and integrated with your existing fleet management database.
