@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local Transport Plan - Daily Routes</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="./mock_transport_data.js"></script>
     <style>
         body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
@@ -255,9 +256,12 @@
     </div>
 
     <script>
-        // IMPROVED: Standardized configuration
+        // Supabase configuration - update with your actual details
         const SUPABASE_URL = 'https://ultxmlfybjoqdhmsqwek.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw';
+        
+        // Initialize Supabase client
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let collectionCount = 1;
         let deliveryCount = 1;
@@ -283,17 +287,19 @@
             }, 5000);
         }
 
-        // IMPROVED: Load drivers with standardized config and better error handling
+        // Load drivers from Supabase database
         async function loadDrivers() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/drivers?select=*&is_active=eq.true`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
+                console.log('🔄 Loading drivers from Supabase...');
                 
-                const drivers = await response.json();
+                const { data: drivers, error } = await supabase
+                    .from('drivers')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('name');
+                
+                if (error) throw error;
+                
                 driversData = drivers.filter(driver => driver.name && driver.name.trim() !== '');
                 
                 const driverSelect = document.getElementById('driverName');
@@ -302,30 +308,41 @@
                 driversData.forEach(driver => {
                     const option = document.createElement('option');
                     option.value = driver.id;
-                    option.textContent = driver.name;
-                    option.dataset.phone = driver.phone;
-                    option.dataset.email = driver.email;
+                    // Flexible field mapping for different database schemas
+                    const name = driver.name || driver.driver_name || driver.full_name;
+                    const phone = driver.phone || driver.phone_number || driver.contact;
+                    const license = driver.license_type || driver.license_class || 'C';
+                    
+                    option.textContent = `${name} (${license})`;
+                    option.dataset.phone = phone || '';
+                    option.dataset.email = driver.email || '';
                     driverSelect.appendChild(option);
                 });
                 
-                console.log(`✅ Loaded ${driversData.length} drivers`);
+                console.log(`✅ Loaded ${driversData.length} drivers from database`);
             } catch (error) {
                 console.error('❌ Error loading drivers:', error);
                 document.getElementById('driverName').innerHTML = '<option value="">Error loading drivers</option>';
-                showMessage('Failed to load drivers. Please refresh the page.', 'error');
+                showMessage('Failed to load drivers from database. Please refresh the page.', 'error');
+                
+                // Fallback to mock data
+                loadMockDrivers();
             }
         }
 
+        // Load trucks from Supabase database
         async function loadTrucks() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/trucks?select=*&is_active=eq.true`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
+                console.log('🔄 Loading trucks from Supabase...');
                 
-                const trucks = await response.json();
+                const { data: trucks, error } = await supabase
+                    .from('trucks')
+                    .select('*')
+                    .eq('status', 'available')
+                    .order('registration');
+                
+                if (error) throw error;
+                
                 trucksData = trucks;
                 
                 const truckSelect = document.getElementById('truckSelect');
@@ -334,29 +351,43 @@
                 trucks.forEach(truck => {
                     const option = document.createElement('option');
                     option.value = truck.id;
-                    option.textContent = `${truck.truck_number} - ${truck.make} ${truck.model}`;
-                    option.dataset.details = `${truck.make} ${truck.model} (${truck.year || 'N/A'}) - ${truck.capacity_kg || 'N/A'}kg - ${truck.license_plate || 'N/A'}`;
+                    
+                    // Flexible field mapping for different database schemas
+                    const registration = truck.registration || truck.truck_number || truck.reg_number;
+                    const make = truck.make || 'Unknown';
+                    const model = truck.model || '';
+                    const year = truck.year || truck.manufacture_year || '';
+                    const capacity = truck.capacity || truck.capacity_kg || truck.max_weight || '';
+                    
+                    option.textContent = `${registration} - ${make} ${model}`;
+                    option.dataset.details = `${registration} - ${make} ${model} ${year ? `(${year})` : ''} ${capacity ? `- ${capacity}kg` : ''}`;
                     truckSelect.appendChild(option);
                 });
                 
-                console.log(`✅ Loaded ${trucks.length} trucks`);
+                console.log(`✅ Loaded ${trucks.length} trucks from database`);
             } catch (error) {
                 console.error('❌ Error loading trucks:', error);
                 document.getElementById('truckSelect').innerHTML = '<option value="">Error loading trucks</option>';
-                showMessage('Failed to load trucks. Please refresh the page.', 'error');
+                showMessage('Failed to load trucks from database. Please refresh the page.', 'error');
+                
+                // Fallback to mock data
+                loadMockTrucks();
             }
         }
 
+        // Load trailers from Supabase database  
         async function loadTrailers() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/trailers?select=*&is_active=eq.true`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
+                console.log('🔄 Loading trailers from Supabase...');
                 
-                const trailers = await response.json();
+                const { data: trailers, error } = await supabase
+                    .from('trailers')
+                    .select('*')
+                    .eq('status', 'available')
+                    .order('registration');
+                
+                if (error) throw error;
+                
                 trailersData = trailers;
                 
                 const trailerSelect = document.getElementById('trailerSelect');
@@ -365,16 +396,27 @@
                 trailers.forEach(trailer => {
                     const option = document.createElement('option');
                     option.value = trailer.id;
-                    option.textContent = `${trailer.trailer_number} - ${trailer.type} ${trailer.make || ''}`;
-                    option.dataset.details = `${trailer.type} ${trailer.make || ''} ${trailer.model || ''} - ${trailer.capacity_kg || 'N/A'}kg - ${trailer.license_plate || 'N/A'}`;
+                    
+                    // Flexible field mapping for different database schemas
+                    const registration = trailer.registration || trailer.trailer_number || trailer.reg_number;
+                    const type = trailer.type || trailer.trailer_type || 'Trailer';
+                    const make = trailer.make || '';
+                    const model = trailer.model || '';
+                    const capacity = trailer.capacity || trailer.capacity_kg || trailer.max_weight || '';
+                    
+                    option.textContent = `${registration} - ${type} ${make}`;
+                    option.dataset.details = `${registration} - ${type} ${make} ${model} ${capacity ? `- ${capacity}kg` : ''}`;
                     trailerSelect.appendChild(option);
                 });
                 
-                console.log(`✅ Loaded ${trailers.length} trailers`);
+                console.log(`✅ Loaded ${trailers.length} trailers from database`);
             } catch (error) {
                 console.error('❌ Error loading trailers:', error);
                 document.getElementById('trailerSelect').innerHTML = '<option value="">Error loading trailers</option>';
-                showMessage('Failed to load trailers. Please refresh the page.', 'error');
+                showMessage('Failed to load trailers from database. Please refresh the page.', 'error');
+                
+                // Fallback to mock data
+                loadMockTrailers();
             }
         }
 
@@ -397,6 +439,76 @@
             const selectedOption = this.options[this.selectedIndex];
             document.getElementById('trailerDetails').value = selectedOption.dataset.details || '';
         });
+
+        // FALLBACK FUNCTIONS - For when Supabase fails
+        function loadMockDrivers() {
+            console.log('🔄 Loading fallback driver data...');
+            driversData = [
+                { id: 1, name: 'auris', phone: '0838352129', license_type: 'C+E', status: 'active' },
+                { id: 2, name: 'John Smith', phone: '087-1234567', license_type: 'C', status: 'active' },
+                { id: 3, name: 'Mary O\'Connor', phone: '086-9876543', license_type: 'C+E', status: 'active' },
+                { id: 4, name: 'David Kelly', phone: '083-5551234', license_type: 'C', status: 'active' }
+            ];
+            
+            const driverSelect = document.getElementById('driverName');
+            driverSelect.innerHTML = '<option value="">Select Driver (Fallback Data)</option>';
+            
+            driversData.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver.id;
+                option.textContent = `${driver.name} (${driver.license_type})`;
+                option.dataset.phone = driver.phone;
+                driverSelect.appendChild(option);
+            });
+            
+            console.log('✅ Loaded fallback driver data');
+        }
+
+        function loadMockTrucks() {
+            console.log('🔄 Loading fallback truck data...');
+            trucksData = [
+                { id: 1, registration: '231LH1460', make: 'Volvo', model: 'FH16', year: 2019, capacity: 44000, status: 'available' },
+                { id: 2, registration: '151D4521', make: 'Scania', model: 'R450', year: 2020, capacity: 40000, status: 'available' },
+                { id: 3, registration: '182MN3467', make: 'DAF', model: 'CF85', year: 2018, capacity: 32000, status: 'available' },
+                { id: 4, registration: '191C8829', make: 'Mercedes', model: 'Actros', year: 2021, capacity: 44000, status: 'available' }
+            ];
+            
+            const truckSelect = document.getElementById('truckSelect');
+            truckSelect.innerHTML = '<option value="">Select Truck (Fallback Data)</option>';
+            
+            trucksData.forEach(truck => {
+                const option = document.createElement('option');
+                option.value = truck.id;
+                option.textContent = `${truck.registration} - ${truck.make} ${truck.model}`;
+                option.dataset.details = `${truck.registration} - ${truck.make} ${truck.model} (${truck.year}) - ${truck.capacity}kg`;
+                truckSelect.appendChild(option);
+            });
+            
+            console.log('✅ Loaded fallback truck data');
+        }
+
+        function loadMockTrailers() {
+            console.log('🔄 Loading fallback trailer data...');
+            trailersData = [
+                { id: 1, registration: 'A3F2E', type: 'Semi-trailer', make: 'Schmitz', capacity: 38000, status: 'available' },
+                { id: 2, registration: 'KT798', type: 'Box trailer', make: 'Krone', capacity: 30000, status: 'available' },
+                { id: 3, registration: 'WX445', type: 'Flatbed', make: 'Kögel', capacity: 32000, status: 'available' },
+                { id: 4, registration: 'DL892', type: 'Curtainsider', make: 'Chereau', capacity: 34000, status: 'available' }
+            ];
+            
+            const trailerSelect = document.getElementById('trailerSelect');
+            trailerSelect.innerHTML = '<option value="">Select Trailer (Fallback Data)</option>';
+            
+            trailersData.forEach(trailer => {
+                const option = document.createElement('option');
+                option.value = trailer.id;
+                option.textContent = `${trailer.registration} - ${trailer.type} ${trailer.make}`;
+                option.dataset.details = `${trailer.registration} - ${trailer.type} ${trailer.make} - ${trailer.capacity}kg`;
+                trailerSelect.appendChild(option);
+            });
+            
+            console.log('✅ Loaded fallback trailer data');
+        }
 
         // Add new points
         function addCollectionPoint() {

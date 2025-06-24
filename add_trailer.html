@@ -4,14 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Trailer</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
         .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header { text-align: center; margin-bottom: 30px; color: #333; }
         .header h1 { color: #6f42c1; margin-bottom: 10px; }
-        .nav-links { margin-bottom: 20px; text-align: center; }
-        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #6f42c1; text-decoration: none; border-radius: 5px; border: 1px solid #6f42c1; }
-        .nav-links a:hover { background: #6f42c1; color: white; }
+        .nav-links { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-links a { 
+            padding: 12px 20px; 
+            background: white; 
+            color: #6f42c1; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            border: 2px solid #6f42c1; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .nav-links a:hover { 
+            background: #6f42c1; 
+            color: white; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(111, 66, 193, 0.3);
+        }
         .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
         .section h3 { color: #6f42c1; margin-bottom: 15px; border-bottom: 2px solid #6f42c1; padding-bottom: 5px; }
         .form-group { margin-bottom: 15px; }
@@ -23,6 +49,7 @@
         .submit-btn { background: #6f42c1; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 20px; }
         .submit-btn:hover { background: #5a32a3; }
         .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #c3e6cb; display: none; }
+        .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #f5c6cb; display: none; }
     </style>
 </head>
 <body>
@@ -31,6 +58,7 @@
         <a href="transport_form_local.html">🚛 Local Planning</a>
         <a href="international_transport.html">🌍 International Planning</a>
         <a href="fleet_management.html">👥 Fleet Management</a>
+        <a href="add_driver.html">👤 Add Driver</a>
         <a href="add_truck.html">➕ Add Truck</a>
         <a href="pod_upload.html">📋 POD Upload</a>
     </div>
@@ -201,26 +229,100 @@
     </div>
 
     <script>
-        document.getElementById('addTrailerForm').addEventListener('submit', function(e) {
+        // Supabase configuration
+        const SUPABASE_URL = 'https://ultxmlfybjoqdhmsqwek.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw';
+        
+        // Initialize Supabase client
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Show message function
+        function showMessage(message, type = 'success') {
+            const messageArea = document.getElementById('messageArea');
+            const className = type === 'error' ? 'error-message' : 'success-message';
+            messageArea.innerHTML = `<div class="${className}" style="display: block;">${message}</div>`;
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('addTrailerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
-            const registration = formData.get('registration');
-            const trailerType = formData.get('trailerType');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
             
-            const messageArea = document.getElementById('messageArea');
-            messageArea.innerHTML = '<div class="success-message" style="display: block;">✅ Trailer successfully added to fleet! <a href="fleet_management.html">View Fleet Management</a></div>';
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Adding trailer to database...';
             
-            // Log activity to dashboard
-            if (window.logActivity) {
-                window.logActivity('Trailer Added', `${registration} - ${trailerType} added to fleet`);
+            try {
+                const formData = new FormData(this);
+                
+                // Get selected features
+                const features = Array.from(this.querySelectorAll('input[name="features"]:checked'))
+                    .map(checkbox => checkbox.value);
+                
+                // Prepare trailer data for Supabase
+                const trailerData = {
+                    registration: formData.get('registration'),
+                    type: formData.get('trailerType'),
+                    make: formData.get('make'),
+                    model: formData.get('model'),
+                    year: parseInt(formData.get('year')),
+                    color: formData.get('color'),
+                    length: parseFloat(formData.get('length')) || null,
+                    width: parseFloat(formData.get('width')) || null,
+                    height: parseFloat(formData.get('height')) || null,
+                    axles: parseInt(formData.get('axles')) || null,
+                    max_weight: parseInt(formData.get('maxWeight')) || null,
+                    tare_weight: parseInt(formData.get('tareWeight')) || null,
+                    capacity: parseInt(formData.get('payloadCapacity')) || null,
+                    mot_expiry: formData.get('motExpiry') || null,
+                    insurance_expiry: formData.get('insuranceExpiry') || null,
+                    tax_expiry: formData.get('taxExpiry') || null,
+                    last_inspection: formData.get('lastInspection') || null,
+                    features: features.length > 0 ? features : null,
+                    notes: formData.get('notes'),
+                    status: 'available',
+                    location: 'Depot'
+                };
+
+                console.log('🚚 Adding trailer to Supabase:', trailerData);
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('trailers')
+                    .insert([trailerData])
+                    .select();
+
+                if (error) throw error;
+
+                const trailer = data[0];
+                console.log('✅ Trailer added successfully:', trailer);
+
+                showMessage(`✅ Trailer ${trailerData.registration} successfully added to database! <a href="fleet_management.html">View Fleet Management</a>`, 'success');
+                
+                // Log activity to dashboard
+                if (typeof(Storage) !== "undefined") {
+                    const activities = JSON.parse(localStorage.getItem('activities') || '[]');
+                    activities.unshift({
+                        type: 'Trailer Added',
+                        description: `${trailerData.registration} - ${trailerData.type} added to fleet`,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('activities', JSON.stringify(activities.slice(0, 10)));
+                }
+                
+                // Clear form
+                this.reset();
+                
+            } catch (error) {
+                console.error('❌ Error adding trailer:', error);
+                showMessage(`❌ Error adding trailer to database: ${error.message}. Please try again.`, 'error');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
-            
-            // Clear form
-            this.reset();
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
         });
     </script>
 </body>

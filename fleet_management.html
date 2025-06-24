@@ -9,9 +9,34 @@
         .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header { text-align: center; margin-bottom: 30px; color: #333; }
         .header h1 { color: #17a2b8; margin-bottom: 10px; }
-        .nav-links { margin-bottom: 20px; text-align: center; }
-        .nav-links a { margin: 0 10px; padding: 8px 16px; background: #f8f9fa; color: #17a2b8; text-decoration: none; border-radius: 5px; border: 1px solid #17a2b8; }
-        .nav-links a:hover { background: #17a2b8; color: white; }
+        .nav-links { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-links a { 
+            padding: 12px 20px; 
+            background: white; 
+            color: #17a2b8; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            border: 2px solid #17a2b8; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .nav-links a:hover { 
+            background: #17a2b8; 
+            color: white; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+        }
         .section { margin-bottom: 30px; padding: 20px; border: 2px solid #e6f3ff; border-radius: 8px; background: #f8fcff; }
         .section h3 { color: #17a2b8; margin-bottom: 15px; border-bottom: 2px solid #17a2b8; padding-bottom: 5px; }
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
@@ -32,6 +57,7 @@
         <a href="index.html">🏠 Dashboard</a>
         <a href="transport_form_local.html">🚛 Local Planning</a>
         <a href="international_transport.html">🌍 International Planning</a>
+        <a href="add_driver.html">👤 Add Driver</a>
         <a href="add_truck.html">➕ Add Truck</a>
         <a href="add_trailer.html">🚚 Add Trailer</a>
         <a href="pod_upload.html">📋 POD Upload</a>
@@ -62,90 +88,210 @@
 
         <div class="section">
             <h3>🚛 Trucks</h3>
-            <div class="fleet-grid">
+            <div class="fleet-grid" id="trucksGrid">
                 <div class="fleet-item">
-                    <h4>231LH1460</h4>
-                    <p><strong>Driver:</strong> auris</p>
-                    <p><strong>Type:</strong> Articulated Truck</p>
-                    <p><strong>Status:</strong> <span class="status busy">On Route</span></p>
-                    <p><strong>Location:</strong> En route to Kepak Cork</p>
-                    <p><strong>Next Service:</strong> 15,000 km</p>
-                </div>
-                
-                <div class="fleet-item">
-                    <h4>151D4521</h4>
-                    <p><strong>Driver:</strong> Unassigned</p>
-                    <p><strong>Type:</strong> Rigid Truck</p>
-                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
-                    <p><strong>Location:</strong> Depot</p>
-                    <p><strong>Next Service:</strong> 8,500 km</p>
-                </div>
-                
-                <div class="fleet-item">
-                    <h4>182MN3467</h4>
-                    <p><strong>Driver:</strong> John Smith</p>
-                    <p><strong>Type:</strong> Van</p>
-                    <p><strong>Status:</strong> <span class="status maintenance">Maintenance</span></p>
-                    <p><strong>Location:</strong> Workshop</p>
-                    <p><strong>Issue:</strong> Brake service</p>
+                    <p>🔄 Loading trucks from database...</p>
                 </div>
             </div>
         </div>
 
         <div class="section">
             <h3>🚚 Trailers</h3>
-            <div class="fleet-grid">
+            <div class="fleet-grid" id="trailersGrid">
                 <div class="fleet-item">
-                    <h4>KT 798</h4>
-                    <p><strong>Attached to:</strong> 231LH1460</p>
-                    <p><strong>Type:</strong> Semi-trailer</p>
-                    <p><strong>Status:</strong> <span class="status busy">In Use</span></p>
-                    <p><strong>Load:</strong> Mixed goods</p>
-                    <p><strong>Capacity:</strong> 38 tonnes</p>
-                </div>
-                
-                <div class="fleet-item">
-                    <h4>WX 445</h4>
-                    <p><strong>Attached to:</strong> None</p>
-                    <p><strong>Type:</strong> Box trailer</p>
-                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
-                    <p><strong>Location:</strong> Depot yard</p>
-                    <p><strong>Capacity:</strong> 24 tonnes</p>
+                    <p>🔄 Loading trailers from database...</p>
                 </div>
             </div>
         </div>
 
         <div class="section">
             <h3>👤 Drivers</h3>
-            <div class="fleet-grid">
+            <div class="fleet-grid" id="driversGrid">
                 <div class="fleet-item">
-                    <h4>auris</h4>
-                    <p><strong>Phone:</strong> 0838352129</p>
-                    <p><strong>Vehicle:</strong> 231LH1460</p>
-                    <p><strong>Status:</strong> <span class="status busy">On Route</span></p>
-                    <p><strong>License:</strong> Class C+E</p>
-                    <p><strong>Hours Today:</strong> 6/13</p>
-                </div>
-                
-                <div class="fleet-item">
-                    <h4>John Smith</h4>
-                    <p><strong>Phone:</strong> 087-1234567</p>
-                    <p><strong>Vehicle:</strong> None</p>
-                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
-                    <p><strong>License:</strong> Class C</p>
-                    <p><strong>Hours Today:</strong> 0/13</p>
-                </div>
-                
-                <div class="fleet-item">
-                    <h4>Mary O'Connor</h4>
-                    <p><strong>Phone:</strong> 086-9876543</p>
-                    <p><strong>Vehicle:</strong> None</p>
-                    <p><strong>Status:</strong> <span class="status available">Available</span></p>
-                    <p><strong>License:</strong> Class C+E</p>
-                    <p><strong>Hours Today:</strong> 2/13</p>
+                    <p>🔄 Loading drivers from database...</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://ultxmlfybjoqdhmsqwek.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw';
+        
+        // Initialize Supabase client
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Load fleet data on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadFleetData();
+        });
+
+        // Load all fleet data
+        async function loadFleetData() {
+            await Promise.all([
+                loadTrucks(),
+                loadTrailers(),
+                loadDrivers()
+            ]);
+        }
+
+        // Load trucks from database
+        async function loadTrucks() {
+            try {
+                console.log('🔄 Loading trucks from Supabase...');
+                
+                const { data: trucks, error } = await supabase
+                    .from('trucks')
+                    .select('*')
+                    .order('registration');
+                
+                if (error) throw error;
+                
+                const trucksGrid = document.getElementById('trucksGrid');
+                trucksGrid.innerHTML = '';
+                
+                if (trucks.length === 0) {
+                    trucksGrid.innerHTML = '<div class="fleet-item"><p>No trucks found in database</p></div>';
+                    return;
+                }
+                
+                trucks.forEach(truck => {
+                    const registration = truck.registration || truck.truck_number || truck.reg_number;
+                    const make = truck.make || 'Unknown';
+                    const model = truck.model || '';
+                    const status = truck.status || 'unknown';
+                    const type = truck.type || truck.truck_type || 'Truck';
+                    const location = truck.location || 'Unknown';
+                    const capacity = truck.capacity || truck.capacity_kg || 'N/A';
+                    
+                    const statusClass = status === 'available' ? 'available' : 
+                                       status === 'busy' ? 'busy' : 
+                                       status === 'maintenance' ? 'maintenance' : 'available';
+                    
+                    const truckDiv = document.createElement('div');
+                    truckDiv.className = 'fleet-item';
+                    truckDiv.innerHTML = `
+                        <h4>${registration}</h4>
+                        <p><strong>Make/Model:</strong> ${make} ${model}</p>
+                        <p><strong>Type:</strong> ${type}</p>
+                        <p><strong>Status:</strong> <span class="status ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></p>
+                        <p><strong>Location:</strong> ${location}</p>
+                        <p><strong>Capacity:</strong> ${capacity}${capacity !== 'N/A' ? 'kg' : ''}</p>
+                    `;
+                    trucksGrid.appendChild(truckDiv);
+                });
+                
+                console.log(`✅ Loaded ${trucks.length} trucks`);
+            } catch (error) {
+                console.error('❌ Error loading trucks:', error);
+                document.getElementById('trucksGrid').innerHTML = '<div class="fleet-item"><p>❌ Error loading trucks from database</p></div>';
+            }
+        }
+
+        // Load trailers from database
+        async function loadTrailers() {
+            try {
+                console.log('🔄 Loading trailers from Supabase...');
+                
+                const { data: trailers, error } = await supabase
+                    .from('trailers')
+                    .select('*')
+                    .order('registration');
+                
+                if (error) throw error;
+                
+                const trailersGrid = document.getElementById('trailersGrid');
+                trailersGrid.innerHTML = '';
+                
+                if (trailers.length === 0) {
+                    trailersGrid.innerHTML = '<div class="fleet-item"><p>No trailers found in database</p></div>';
+                    return;
+                }
+                
+                trailers.forEach(trailer => {
+                    const registration = trailer.registration || trailer.trailer_number || trailer.reg_number;
+                    const type = trailer.type || trailer.trailer_type || 'Trailer';
+                    const status = trailer.status || 'unknown';
+                    const location = trailer.location || 'Unknown';
+                    const capacity = trailer.capacity || trailer.capacity_kg || 'N/A';
+                    const attachedTo = trailer.attached_truck || 'None';
+                    
+                    const statusClass = status === 'available' ? 'available' : 
+                                       status === 'busy' ? 'busy' : 
+                                       status === 'maintenance' ? 'maintenance' : 'available';
+                    
+                    const trailerDiv = document.createElement('div');
+                    trailerDiv.className = 'fleet-item';
+                    trailerDiv.innerHTML = `
+                        <h4>${registration}</h4>
+                        <p><strong>Type:</strong> ${type}</p>
+                        <p><strong>Status:</strong> <span class="status ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></p>
+                        <p><strong>Attached to:</strong> ${attachedTo}</p>
+                        <p><strong>Location:</strong> ${location}</p>
+                        <p><strong>Capacity:</strong> ${capacity}${capacity !== 'N/A' ? 'kg' : ''}</p>
+                    `;
+                    trailersGrid.appendChild(trailerDiv);
+                });
+                
+                console.log(`✅ Loaded ${trailers.length} trailers`);
+            } catch (error) {
+                console.error('❌ Error loading trailers:', error);
+                document.getElementById('trailersGrid').innerHTML = '<div class="fleet-item"><p>❌ Error loading trailers from database</p></div>';
+            }
+        }
+
+        // Load drivers from database
+        async function loadDrivers() {
+            try {
+                console.log('🔄 Loading drivers from Supabase...');
+                
+                const { data: drivers, error } = await supabase
+                    .from('drivers')
+                    .select('*')
+                    .order('name');
+                
+                if (error) throw error;
+                
+                const driversGrid = document.getElementById('driversGrid');
+                driversGrid.innerHTML = '';
+                
+                if (drivers.length === 0) {
+                    driversGrid.innerHTML = '<div class="fleet-item"><p>No drivers found in database</p></div>';
+                    return;
+                }
+                
+                drivers.forEach(driver => {
+                    const name = driver.name || driver.driver_name || driver.full_name;
+                    const phone = driver.phone || driver.phone_number || driver.contact || 'N/A';
+                    const status = driver.status || 'unknown';
+                    const license = driver.license_type || driver.license_class || 'N/A';
+                    const vehicle = driver.assigned_vehicle || 'None';
+                    const hoursToday = driver.hours_today || 0;
+                    
+                    const statusClass = status === 'active' ? 'available' : 
+                                       status === 'busy' ? 'busy' : 
+                                       status === 'off-duty' ? 'maintenance' : 'available';
+                    
+                    const driverDiv = document.createElement('div');
+                    driverDiv.className = 'fleet-item';
+                    driverDiv.innerHTML = `
+                        <h4>${name}</h4>
+                        <p><strong>Phone:</strong> ${phone}</p>
+                        <p><strong>License:</strong> ${license}</p>
+                        <p><strong>Status:</strong> <span class="status ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></p>
+                        <p><strong>Vehicle:</strong> ${vehicle}</p>
+                        <p><strong>Hours Today:</strong> ${hoursToday}/13</p>
+                    `;
+                    driversGrid.appendChild(driverDiv);
+                });
+                
+                console.log(`✅ Loaded ${drivers.length} drivers`);
+            } catch (error) {
+                console.error('❌ Error loading drivers:', error);
+                document.getElementById('driversGrid').innerHTML = '<div class="fleet-item"><p>❌ Error loading drivers from database</p></div>';
+            }
+        }
+    </script>
 </body>
 </html> 

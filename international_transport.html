@@ -419,9 +419,8 @@
         const SUPABASE_URL = 'https://ultxmlfybjoqdhmsqwek.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsdHhtbGZ5YmpvcWRobXNxd2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NzgyMjksImV4cCI6MjA2NjA1NDIyOX0.p9bDj7-uSfRpOSpuFcK78uwNFV5O8fxuEMNQdBrIxGw';
         
-        // FIXED: Correct Supabase client initialization
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Initialize Supabase client
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let transitPointCount = 0;
 
@@ -444,10 +443,12 @@
         // IMPROVED: Load drivers with better error handling
         async function loadDrivers() {
             try {
-                const { data, error } = await supabaseClient
+                console.log('🔄 Loading drivers from Supabase...');
+                
+                const { data, error } = await supabase
                     .from('drivers')
                     .select('*')
-                    .eq('is_active', true)
+                    .eq('status', 'active')
                     .order('name');
 
                 if (error) throw error;
@@ -460,8 +461,12 @@
                 secondarySelect.innerHTML = '<option value="">No secondary driver</option>';
                 
                 data.forEach(driver => {
-                    const option1 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
-                    const option2 = new Option(`${driver.name} - ${driver.phone}`, driver.id);
+                    const name = driver.name || driver.driver_name || driver.full_name;
+                    const phone = driver.phone || driver.phone_number || driver.contact;
+                    const license = driver.license_type || driver.license_class || 'C';
+                    
+                    const option1 = new Option(`${name} - ${phone} (${license})`, driver.id);
+                    const option2 = new Option(`${name} - ${phone} (${license})`, driver.id);
                     primarySelect.add(option1);
                     secondarySelect.add(option2);
                 });
@@ -476,11 +481,13 @@
         // IMPROVED: Load trucks with better error handling
         async function loadTrucks() {
             try {
-                const { data, error } = await supabaseClient
+                console.log('🔄 Loading trucks from Supabase...');
+                
+                const { data, error } = await supabase
                     .from('trucks')
                     .select('*')
-                    .eq('is_active', true)
-                    .order('truck_number');
+                    .eq('status', 'available')
+                    .order('registration');
 
                 if (error) throw error;
 
@@ -488,7 +495,11 @@
                 select.innerHTML = '<option value="">Select truck</option>';
                 
                 data.forEach(truck => {
-                    const option = new Option(`${truck.truck_number} - ${truck.make} ${truck.model}`, truck.id);
+                    const registration = truck.registration || truck.truck_number || truck.reg_number;
+                    const make = truck.make || 'Unknown';
+                    const model = truck.model || '';
+                    
+                    const option = new Option(`${registration} - ${make} ${model}`, truck.id);
                     select.add(option);
                 });
                 
@@ -502,11 +513,13 @@
         // IMPROVED: Load trailers with better error handling
         async function loadTrailers() {
             try {
-                const { data, error } = await supabaseClient
+                console.log('🔄 Loading trailers from Supabase...');
+                
+                const { data, error } = await supabase
                     .from('trailers')
                     .select('*')
-                    .eq('is_active', true)
-                    .order('trailer_number');
+                    .eq('status', 'available')
+                    .order('registration');
 
                 if (error) throw error;
 
@@ -514,7 +527,10 @@
                 select.innerHTML = '<option value="">No trailer required</option>';
                 
                 data.forEach(trailer => {
-                    const option = new Option(`${trailer.trailer_number} - ${trailer.type}`, trailer.id);
+                    const registration = trailer.registration || trailer.trailer_number || trailer.reg_number;
+                    const type = trailer.type || trailer.trailer_type || 'Trailer';
+                    
+                    const option = new Option(`${registration} - ${type}`, trailer.id);
                     select.add(option);
                 });
                 
