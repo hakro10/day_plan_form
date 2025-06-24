@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local Transport Plan - Daily Routes</title>
+    <script src="./mock_transport_data.js"></script>
     <style>
         body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
         .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -515,13 +516,20 @@
         // Update summary when route type changes
         document.getElementById('routeType').addEventListener('change', updateRouteSummary);
 
-        // MOCK DATA FUNCTION - Updated to use external mock data
+        // MOCK DATA FUNCTION - Now properly loads from external file
         function fillMockData() {
-            // Route Information from mock data
-            document.getElementById('routeDate').value = '2025-06-23';
-            document.getElementById('routeType').value = 'mixed_route';
-            document.getElementById('startTime').value = '06:00';
-            document.getElementById('expectedEndTime').value = '18:00';
+            // Check if mockTransportData is loaded from external file
+            if (typeof mockTransportData === 'undefined') {
+                showMessage('❌ Mock data file not loaded! Using fallback data.', 'error');
+                fillFallbackMockData();
+                return;
+            }
+
+            // Route Information from external mock data file
+            document.getElementById('routeDate').value = mockTransportData.routeDate;
+            document.getElementById('routeType').value = mockTransportData.routeType;
+            document.getElementById('startTime').value = mockTransportData.startTime;
+            document.getElementById('expectedEndTime').value = mockTransportData.expectedEndTime;
 
             // Wait for data to load, then select specific vehicles and driver
             setTimeout(() => {
@@ -563,71 +571,26 @@
             collectionCount = 0;
             deliveryCount = 0;
 
-            // Mock Collection Points - Updated with your exact data
-            const mockCollections = [
-                {
-                    address: 'NB Warehouse, Citywest',
-                    timeFrom: '07:00',
-                    timeTo: '07:30',
-                    contact: 'John Byrne - 087-1234567',
-                    duration: '30',
-                    notes: 'Take empty trailer'
-                },
-                {
-                    address: 'K&N Distribution Center, Portlaoise',
-                    timeFrom: '08:30',
-                    timeTo: '10:00',
-                    contact: 'Mary O\'Connor - 086-9876543',
-                    duration: '60',
-                    notes: 'Collect empty crates for Kepak, Cork'
-                },
-                {
-                    address: 'GXO Logistics, Naas',
-                    timeFrom: '11:00',
-                    timeTo: '12:00',
-                    contact: 'Pat Murphy - 085-5555555',
-                    duration: '45',
-                    notes: 'Live Tracking for Kepak Cork'
-                },
-                {
-                    address: 'Kepak Cork Processing Plant',
-                    timeFrom: '13:00',
-                    timeTo: '14:00',
-                    contact: 'Tom Kelly - 087-7777777',
-                    duration: '30',
-                    notes: 'Collect mixed golds'
-                },
-                {
-                    address: 'Kingsgate Portlaoise Distribution',
-                    timeFrom: '15:00',
-                    timeTo: '16:00',
-                    contact: 'Joe Ryan - 086-3333333',
-                    duration: '45',
-                    notes: 'Collect mixed goods for final delivery'
-                }
-            ];
+            // Convert external mock data to collection format
+            const mockCollections = mockTransportData.collectionAddress.map((address, index) => ({
+                address: address,
+                timeFrom: mockTransportData.collectionTimeFrom[index],
+                timeTo: mockTransportData.collectionTimeTo[index],
+                contact: mockTransportData.collectionContact[index],
+                duration: mockTransportData.collectionDuration[index].toString(),
+                notes: mockTransportData.collectionSpecialInstructions[index]
+            }));
 
-            // Mock Delivery Points - Updated with your exact data
-            const mockDeliveries = [
-                {
-                    address: 'Kepak Cork',
-                    timeFrom: '14:00',
-                    timeTo: '15:00',
-                    contact: 'Mike O\'Brien - 021-4444444',
-                    duration: '30',
-                    priority: 'high',
-                    notes: 'UNLOAD 6 CRATES'
-                },
-                {
-                    address: 'NB Return Depot, Dispatch Bay',
-                    timeFrom: '20:00',
-                    timeTo: '20:30',
-                    contact: 'Night Supervisor - 087-9999999',
-                    duration: '20',
-                    priority: 'medium',
-                    notes: 'Drop trailer at dispatch bay, return unladen'
-                }
-            ];
+            // Convert external mock data to delivery format
+            const mockDeliveries = mockTransportData.deliveryAddress.map((address, index) => ({
+                address: address,
+                timeFrom: mockTransportData.deliveryTimeFrom[index],
+                timeTo: mockTransportData.deliveryTimeTo[index],
+                contact: mockTransportData.deliveryContact[index],
+                duration: mockTransportData.deliveryDuration[index].toString(),
+                priority: mockTransportData.deliveryPriority[index],
+                notes: mockTransportData.deliverySpecialInstructions[index]
+            }));
 
             // Add mock collection points
             mockCollections.forEach((collection, index) => {
@@ -658,16 +621,63 @@
                 currentPoint.querySelector('textarea[name="deliveryNotes[]"]').value = delivery.notes;
             });
 
-            // Additional Instructions - Based on actual plan data
-            document.getElementById('routeInstructions').value = 'Avoid N7 construction zone. Use M50 route. Mandatory 45min break after Portlaoise collection.';
-            document.getElementById('fuelStops').value = 'if_needed';
-            document.getElementById('returnToDepot').value = 'same_day';
+            // Additional Instructions from external mock data
+            document.getElementById('routeInstructions').value = mockTransportData.routeInstructions;
+            document.getElementById('fuelStops').value = mockTransportData.fuelStops;
+            document.getElementById('returnToDepot').value = mockTransportData.returnToDepot;
 
             // Update route summary
             updateRouteSummary();
 
             // Show success message
-            showMessage('🎯 Mock data filled successfully! Ready for testing.', 'success');
+            showMessage('🎯 Mock data loaded from external file! All data synced.', 'success');
+        }
+
+        // FALLBACK MOCK DATA FUNCTION (if external file fails)
+        function fillFallbackMockData() {
+            // Use hardcoded fallback data
+            document.getElementById('routeDate').value = '2025-06-23';
+            document.getElementById('routeType').value = 'mixed_route';
+            document.getElementById('startTime').value = '06:00';
+            document.getElementById('expectedEndTime').value = '18:00';
+
+            // Wait for data to load, then select specific vehicles and driver
+            setTimeout(() => {
+                const driverSelect = document.getElementById('driverName');
+                for (let i = 0; i < driverSelect.options.length; i++) {
+                    if (driverSelect.options[i].text.toLowerCase().includes('auris')) {
+                        driverSelect.selectedIndex = i;
+                        driverSelect.dispatchEvent(new Event('change'));
+                        break;
+                    }
+                }
+            }, 500);
+
+            // Clear existing collection/delivery points
+            document.getElementById('collectionPoints').innerHTML = '';
+            document.getElementById('deliveryPoints').innerHTML = '';
+            collectionCount = 0;
+            deliveryCount = 0;
+
+            // Fallback collection data
+            const fallbackCollections = [
+                { address: 'NB Warehouse, Drogheda', timeFrom: '07:00', timeTo: '07:30', contact: 'John Byrne - 087-1234567', duration: '30', notes: 'Take empty trailer' },
+                { address: 'K&N Distribution Center, Swords', timeFrom: '08:30', timeTo: '10:00', contact: 'Mary O\'Connor - 086-9876543', duration: '60', notes: 'Collect empty crates for Kepak, Cork' }
+            ];
+
+            fallbackCollections.forEach((collection) => {
+                addCollectionPoint();
+                const points = document.querySelectorAll('#collectionPoints .point-group');
+                const currentPoint = points[points.length - 1];
+                currentPoint.querySelector('input[name="collectionAddress[]"]').value = collection.address;
+                currentPoint.querySelector('input[name="collectionTimeFrom[]"]').value = collection.timeFrom;
+                currentPoint.querySelector('input[name="collectionTimeTo[]"]').value = collection.timeTo;
+                currentPoint.querySelector('input[name="collectionContact[]"]').value = collection.contact;
+                currentPoint.querySelector('input[name="collectionDuration[]"]').value = collection.duration;
+                currentPoint.querySelector('textarea[name="collectionNotes[]"]').value = collection.notes;
+            });
+
+            showMessage('⚠️ Using fallback mock data (external file not available)', 'error');
         }
 
         // CLEAR FORM FUNCTION

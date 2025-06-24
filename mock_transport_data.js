@@ -1,4 +1,5 @@
 // Mock data that matches the current transport plan form exactly
+// This file is loaded directly by the HTML page
 const mockTransportData = {
   // Route Information
   routeDate: "2025-06-23",
@@ -63,5 +64,12 @@ const mockTransportData = {
   returnToDepot: "same_day"
 };
 
-// Export for testing
-module.exports = mockTransportData; 
+// Make available globally for HTML pages
+if (typeof window !== 'undefined') {
+  window.mockTransportData = mockTransportData;
+}
+
+// Export for testing (Node.js)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = mockTransportData;
+} 
